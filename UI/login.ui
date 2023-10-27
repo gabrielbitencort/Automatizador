@@ -10,6 +10,12 @@
     <height>274</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>444</width>
+    <height>274</height>
+   </size>
+  </property>
   <property name="maximumSize">
    <size>
     <width>444</width>
@@ -18,6 +24,9 @@
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 255);</string>
   </property>
   <widget class="QLabel" name="label_2">
    <property name="geometry">
@@ -57,7 +66,7 @@
      <x>50</x>
      <y>180</y>
      <width>90</width>
-     <height>28</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -67,7 +76,7 @@
   <widget class="QPushButton" name="btn_exit">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>310</x>
      <y>180</y>
      <width>90</width>
      <height>28</height>
@@ -141,15 +150,28 @@
     <item>
      <widget class="QLabel" name="label_4">
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#000000;&quot;&gt;Esqueceu sua senha?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
+  <widget class="QPushButton" name="btn_register">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>180</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cadastrar</string>
+   </property>
+  </widget>
  </widget>
  <resources>
-  <include location="../img.qrc"/>
+  <include location="img.qrc"/>
  </resources>
  <connections/>
 </ui>

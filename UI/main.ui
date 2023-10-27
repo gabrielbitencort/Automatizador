@@ -133,6 +133,7 @@ color: rgb(255, 255, 255);</string>
     <addaction name="actionApagar"/>
     <addaction name="actionAtualizar"/>
     <addaction name="actionRefresh"/>
+    <addaction name="actionSair"/>
    </widget>
    <widget class="QMenu" name="menuEmails">
     <property name="title">
@@ -168,7 +169,7 @@ color: rgb(255, 255, 255);</string>
   </widget>
   <action name="actionProcurar">
    <property name="icon">
-    <iconset resource="../img2.qrc">
+    <iconset>
      <normaloff>:/img2/Icons/search.svg</normaloff>:/img2/Icons/search.svg</iconset>
    </property>
    <property name="text">
@@ -177,7 +178,7 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionCadastrar">
    <property name="icon">
-    <iconset resource="../img2.qrc">
+    <iconset>
      <normaloff>:/img2/Icons/cadastrar.svg</normaloff>:/img2/Icons/cadastrar.svg</iconset>
    </property>
    <property name="text">
@@ -186,7 +187,7 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionApagar">
    <property name="icon">
-    <iconset resource="../img2.qrc">
+    <iconset>
      <normaloff>:/img2/Icons/del.svg</normaloff>:/img2/Icons/del.svg</iconset>
    </property>
    <property name="text">
@@ -195,7 +196,7 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionAtualizar">
    <property name="icon">
-    <iconset resource="../img2.qrc">
+    <iconset>
      <normaloff>:/img2/Icons/update.svg</normaloff>:/img2/Icons/update.svg</iconset>
    </property>
    <property name="text">
@@ -204,7 +205,7 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionRefresh">
    <property name="icon">
-    <iconset resource="../img2.qrc">
+    <iconset>
      <normaloff>:/img2/Icons/refresh.svg</normaloff>:/img2/Icons/refresh.svg</iconset>
    </property>
    <property name="text">
@@ -216,7 +217,7 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionAbrir">
    <property name="icon">
-    <iconset resource="../img2.qrc">
+    <iconset>
      <normaloff>:/img2/Icons/open.svg</normaloff>:/img2/Icons/open.svg</iconset>
    </property>
    <property name="text">
@@ -225,7 +226,7 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionNovo">
    <property name="icon">
-    <iconset resource="../img2.qrc">
+    <iconset>
      <normaloff>:/img2/Icons/new.svg</normaloff>:/img2/Icons/new.svg</iconset>
    </property>
    <property name="text">
@@ -234,7 +235,7 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionAbrir_Recentes">
    <property name="icon">
-    <iconset resource="../img2.qrc">
+    <iconset>
      <normaloff>:/img2/Icons/new.svg</normaloff>:/img2/Icons/new.svg</iconset>
    </property>
    <property name="text">
@@ -243,11 +244,16 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionSalvar">
    <property name="icon">
-    <iconset resource="../img2.qrc">
+    <iconset>
      <normaloff>:/img2/Icons/save.svg</normaloff>:/img2/Icons/save.svg</iconset>
    </property>
    <property name="text">
     <string>Salvar</string>
+   </property>
+  </action>
+  <action name="actionSair">
+   <property name="text">
+    <string>Sair</string>
    </property>
   </action>
  </widget>

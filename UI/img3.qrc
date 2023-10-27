@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="img3">
+    <file>../Icons/cadastrar.svg</file>
+  </qresource>
+</RCC>
