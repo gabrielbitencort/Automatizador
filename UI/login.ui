@@ -29,7 +29,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">image: url(:/img/user2.svg);</string>
+    <string notr="true">image: url(:/img/Icons/user2.svg);</string>
    </property>
    <property name="text">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -45,7 +45,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">image: url(:/img/lock.svg);</string>
+    <string notr="true">image: url(:/img/Icons/lock.svg);</string>
    </property>
    <property name="text">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -149,7 +149,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="../Icons/img.qrc"/>
+  <include location="../img.qrc"/>
  </resources>
  <connections/>
 </ui>

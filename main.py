@@ -7,7 +7,7 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtPrintSupport import *
 import os, sys
 
-app=QtWidgets.QApplication([])
-tela=uic.loadUi("UI/login.ui")
+app = QtWidgets.QApplication([])
+tela = uic.loadUi("UI/login.ui")
 tela.show()
 app.exec()

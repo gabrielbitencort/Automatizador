@@ -214,7 +214,7 @@ background-color: rgb(255, 255, 255);</string>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">image: url(:/img3/cadastrar.svg);</string>
+    <string notr="true">image: url(:/img3/Icons/cadastrar.svg);</string>
    </property>
    <property name="text">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -222,7 +222,7 @@ background-color: rgb(255, 255, 255);</string>
   </widget>
  </widget>
  <resources>
-  <include location="../Icons/img3.qrc"/>
+  <include location="../img3.qrc"/>
  </resources>
  <connections/>
 </ui>

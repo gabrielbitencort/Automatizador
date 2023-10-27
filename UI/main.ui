@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>804</width>
-    <height>554</height>
+    <height>330</height>
    </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>804</width>
+    <height>330</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -162,8 +168,8 @@ color: rgb(255, 255, 255);</string>
   </widget>
   <action name="actionProcurar">
    <property name="icon">
-    <iconset resource="../Icons/img2.qrc">
-     <normaloff>:/img2/search.svg</normaloff>:/img2/search.svg</iconset>
+    <iconset resource="../img2.qrc">
+     <normaloff>:/img2/Icons/search.svg</normaloff>:/img2/Icons/search.svg</iconset>
    </property>
    <property name="text">
     <string>Procurar</string>
@@ -171,8 +177,8 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionCadastrar">
    <property name="icon">
-    <iconset resource="../Icons/img2.qrc">
-     <normaloff>:/img2/cadastrar.svg</normaloff>:/img2/cadastrar.svg</iconset>
+    <iconset resource="../img2.qrc">
+     <normaloff>:/img2/Icons/cadastrar.svg</normaloff>:/img2/Icons/cadastrar.svg</iconset>
    </property>
    <property name="text">
     <string>Cadastrar</string>
@@ -180,8 +186,8 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionApagar">
    <property name="icon">
-    <iconset resource="../Icons/img2.qrc">
-     <normaloff>:/img2/del.svg</normaloff>:/img2/del.svg</iconset>
+    <iconset resource="../img2.qrc">
+     <normaloff>:/img2/Icons/del.svg</normaloff>:/img2/Icons/del.svg</iconset>
    </property>
    <property name="text">
     <string>Apagar</string>
@@ -189,8 +195,8 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionAtualizar">
    <property name="icon">
-    <iconset resource="../Icons/img2.qrc">
-     <normaloff>:/img2/update.svg</normaloff>:/img2/update.svg</iconset>
+    <iconset resource="../img2.qrc">
+     <normaloff>:/img2/Icons/update.svg</normaloff>:/img2/Icons/update.svg</iconset>
    </property>
    <property name="text">
     <string>Atualizar</string>
@@ -198,8 +204,8 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionRefresh">
    <property name="icon">
-    <iconset resource="../Icons/img2.qrc">
-     <normaloff>:/img2/refresh.svg</normaloff>:/img2/refresh.svg</iconset>
+    <iconset resource="../img2.qrc">
+     <normaloff>:/img2/Icons/refresh.svg</normaloff>:/img2/Icons/refresh.svg</iconset>
    </property>
    <property name="text">
     <string>Refresh</string>
@@ -210,8 +216,8 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionAbrir">
    <property name="icon">
-    <iconset resource="../Icons/img2.qrc">
-     <normaloff>:/img2/open.svg</normaloff>:/img2/open.svg</iconset>
+    <iconset resource="../img2.qrc">
+     <normaloff>:/img2/Icons/open.svg</normaloff>:/img2/Icons/open.svg</iconset>
    </property>
    <property name="text">
     <string>Abrir</string>
@@ -219,8 +225,8 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionNovo">
    <property name="icon">
-    <iconset resource="../Icons/img2.qrc">
-     <normaloff>:/img2/new.svg</normaloff>:/img2/new.svg</iconset>
+    <iconset resource="../img2.qrc">
+     <normaloff>:/img2/Icons/new.svg</normaloff>:/img2/Icons/new.svg</iconset>
    </property>
    <property name="text">
     <string>Novo</string>
@@ -228,8 +234,8 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionAbrir_Recentes">
    <property name="icon">
-    <iconset resource="../Icons/img2.qrc">
-     <normaloff>:/img2/new.svg</normaloff>:/img2/new.svg</iconset>
+    <iconset resource="../img2.qrc">
+     <normaloff>:/img2/Icons/new.svg</normaloff>:/img2/Icons/new.svg</iconset>
    </property>
    <property name="text">
     <string>Abrir Recentes</string>
@@ -237,8 +243,8 @@ color: rgb(255, 255, 255);</string>
   </action>
   <action name="actionSalvar">
    <property name="icon">
-    <iconset resource="../Icons/img2.qrc">
-     <normaloff>:/img2/save.svg</normaloff>:/img2/save.svg</iconset>
+    <iconset resource="../img2.qrc">
+     <normaloff>:/img2/Icons/save.svg</normaloff>:/img2/Icons/save.svg</iconset>
    </property>
    <property name="text">
     <string>Salvar</string>
@@ -246,7 +252,7 @@ color: rgb(255, 255, 255);</string>
   </action>
  </widget>
  <resources>
-  <include location="../Icons/img2.qrc"/>
+  <include location="../img2.qrc"/>
  </resources>
  <connections/>
 </ui>
