@@ -1,0 +1,16 @@
+<RCC>
+  <qresource prefix="img">
+    <file>key.svg</file>
+    <file>lock.svg</file>
+    <file>cadastrar.svg</file>
+    <file>clean.svg</file>
+    <file>config.svg</file>
+    <file>del.svg</file>
+    <file>exit.svg</file>
+    <file>logo.png</file>
+    <file>search.svg</file>
+    <file>user.svg</file>
+    <file>voff.svg</file>
+    <file>von.svg</file>
+  </qresource>
+</RCC>
