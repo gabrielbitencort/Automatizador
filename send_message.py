@@ -11,7 +11,7 @@ username = 'gabrielbiten.henrique@gmail.com'
 password = 'zsbr anlf uiab hvgh'
 
 # Ler a lista de contatos do arquivo externo
-with open("contacts2.txt", 'r') as archive:
+with open("contacts.txt", 'r') as archive:
     contacts_list = [line.split() for line in archive]
 
 try:

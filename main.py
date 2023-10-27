@@ -1,18 +1,13 @@
-import sys
-# from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5.uic import loadUi
+from PyQt5 import uic, QtWidgets
+from PyQt5.Qt import Qt
+from PyQt5.QtCore import pyqtSlot
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtPrintSupport import *
+import os, sys
 
-
-class MyApplication(QMainWindow):
-    def __init__(self):
-        super(MyApplication, self).__init__()
-        # Load the user interface
-        loadUi('', self)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MyApplication()
-    window.show()
-    sys.exit(app.exec_())
+app=QtWidgets.QApplication([])
+tela=uic.loadUi("UI/login.ui")
+tela.show()
+app.exec()
