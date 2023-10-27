@@ -23,7 +23,7 @@ try:
         msg['Subject'] = 'Teste Automatizador de Emails'
 
         # Attach html_file to email body
-        with open('message.html', 'r', encoding='utf-8') as html_file:
+        with open('Messages/message.html', 'r', encoding='utf-8') as html_file:
             email_body = MIMEText(html_file.read(), 'html', 'utf-8')
         msg.attach(email_body)
 
