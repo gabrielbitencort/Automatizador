@@ -33,3 +33,12 @@ class LoginWindow:
         self.btn_login.place(x=85, y=60)
 
         self.text_message.place(x=10, y=87)
+
+        self.center_window(220, 120)
+
+    def center_window(self, width, height):
+        screen_width = self.window.winfo_screenwidth()
+        screen_height = self.window.winfo_screenheight()
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        self.window.geometry(f"{width}x{height}+{x}+{y}")

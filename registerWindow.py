@@ -51,3 +51,12 @@ class RegisterWindow:
         self.btn_cancel.place(x=250, y=80)
 
         self.text_message.place(x=10, y=120)
+
+        self.center_window(420, 150)
+
+    def center_window(self, width, height):
+        screen_width = self.window.winfo_screenwidth()
+        screen_height = self.window.winfo_screenheight()
+        x = (screen_width - width) // 2
+        y = (screen_height - height) // 2
+        self.window.geometry(f"{width}x{height}+{x}+{y}")

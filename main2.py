@@ -37,6 +37,27 @@ def open_registerWindow(login_window):
     registerWindow.window.mainloop()
 
 
+# Function to verify if name and email exists
+def check_duplicate_user(name, email):
+    try:
+        db = sqlite3.connect("Automatizador.db")
+        cursor = db.cursor()
+        # Execute a cunsult to verify if exists a user with same name
+        cursor.execute('SELECT * FROM users WHERE name = ? OR email = ?', (name, email))
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            return True
+        else:
+            return False
+    except sqlite3.Error as error:
+        print("Erro ao verificar duplicatas: ", error)
+        return True
+    finally:
+        db.close()
+
+
+# Function to register users
 def userRegister(registerWindow):
     user_login = registerWindow.input_name.get()
     user_email = registerWindow.input_email.get()
@@ -45,23 +66,26 @@ def userRegister(registerWindow):
 
     if user_login and user_email and user_passwd and user_cpass:
         if user_passwd == user_cpass:
-            try:
-                db = sqlite3.connect('Automatizador.db')
-                cursor = db.cursor()
-                cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-                               id INTEGER PRIMARY KEY,
-                               name TEXT, 
-                               email TEXT, 
-                               passwd TEXT
-                               )
-                ''')
-                cursor.execute('INSERT INTO users (name, email, passwd) VALUES (?, ?, ?)', (user_login, user_email, user_passwd))
-                db.commit()
-                db.close()
-                registerWindow.text_message.config(text="Usuário cadastrado com sucesso.")
-            except sqlite3.Error as error:
-                registerWindow.text_message.config(text="Erro ao inserir os dados!")
-                print("Erro ao inserir os dados: ", error)
+            if check_duplicate_user(user_login, user_email):
+                registerWindow.text_message.config(text="Nome ou email já foram cadastrados.")
+            else:
+                try:
+                    db = sqlite3.connect('Automatizador.db')
+                    cursor = db.cursor()
+                    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+                                   id INTEGER PRIMARY KEY,
+                                   name TEXT, 
+                                   email TEXT, 
+                                   passwd TEXT
+                                   )
+                    ''')
+                    cursor.execute('INSERT INTO users (name, email, passwd) VALUES (?, ?, ?)', (user_login, user_email, user_passwd))
+                    db.commit()
+                    db.close()
+                    registerWindow.text_message.config(text="Usuário cadastrado com sucesso.")
+                except sqlite3.Error as error:
+                    registerWindow.text_message.config(text="Erro ao inserir os dados!")
+                    print("Erro ao inserir os dados: ", error)
         else:
             registerWindow.text_message.config(text="As senhas digitadas estão diferentes!")
     else:
