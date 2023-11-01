@@ -9,26 +9,35 @@ def call_main_window(event=None):
     user_name = loginWindow.input_name.get()
     password = loginWindow.input_passwd.get()
     if user_name and password:
-        if user_name == 'gabriel' and password == '123456':
-            loginWindow.text_message.config(text='Login realizado com sucesso.')
-            loginWindow.window.after(1000, open_mainWindow())
-        else:
-            loginWindow.text_message.config(text='Dados de login incorretos!')
+        try:
+            db = sqlite3.connect("Automatizador.db")
+            cursor = db.cursor()
+            cursor.execute('SELECT * FROM users WHERE name = ? AND passwd = ?', (user_name, password))
+            user = cursor.fetchone()
+            db.close()
+
+            if user is not None:
+                loginWindow.text_message.config(text='Login realizado com secesso')
+                loginWindow.window.after(1000, open_mainWindow())
+            else:
+                loginWindow.text_message.config(text='Dados de login incorretos')
+        except sqlite3.Error as error:
+            print("Erro ao consultar o banco de dados: ", error)
     else:
         loginWindow.text_message.config(text='Preencha todos os campos.')
 
 
 def open_mainWindow():
     loginWindow.window.destroy()
-    mainWindow = MainWindow(open_registerWindow)
+    mainWindow = MainWindow(lambda: open_registerWindow(loginWindow))
     mainWindow.window.mainloop()
 
-def open_registerWindow():
-    registerWindow = RegisterWindow(userRegister)
+def open_registerWindow(login_window):
+    registerWindow = RegisterWindow(lambda: userRegister(registerWindow))
     registerWindow.window.mainloop()
 
 
-def userRegister(event=None):
+def userRegister(registerWindow):
     user_login = registerWindow.input_name.get()
     user_email = registerWindow.input_email.get()
     user_passwd = registerWindow.input_passwd.get()
@@ -39,7 +48,7 @@ def userRegister(event=None):
             try:
                 db = sqlite3.connect('Automatizador.db')
                 cursor = db.cursor()
-                cursor.execute('''CREATE TABLE IF NOT EXISTS users ("
+                cursor.execute('''CREATE TABLE IF NOT EXISTS users (
                                id INTEGER PRIMARY KEY,
                                name TEXT, 
                                email TEXT, 
