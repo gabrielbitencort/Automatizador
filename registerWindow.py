@@ -29,7 +29,7 @@ class RegisterWindow:
         self.btn_register = tk.Button(self.window, text='CADASTRAR', command=userRegister)
 
         # Create a cancel button
-        self.btn_cancel = tk.Button(self.window, text='CANCELAR')
+        self.btn_cancel = tk.Button(self.window, text='CANCELAR', command=self.cancel_registration)
 
         # Create a messages Label
         self.text_message = tk.Label(self.window, text='')
@@ -53,6 +53,13 @@ class RegisterWindow:
         self.text_message.place(x=10, y=120)
 
         self.center_window(420, 150)
+
+        self.input_fields = [self.input_name, self.input_email, self.input_passwd, self.input_cpass]
+
+    def cancel_registration(self):
+        self.text_message.config(text="Cadastro cancelado.")
+        for entry in self.input_fields:
+            entry.delete(0, tk.END)
 
     def center_window(self, width, height):
         screen_width = self.window.winfo_screenwidth()
