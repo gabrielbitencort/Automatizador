@@ -1,4 +1,5 @@
 import os
+import platform
 import tkinter as tk
 from tkinter import filedialog
 
@@ -8,8 +9,14 @@ class MainWindow:
         # Create a window with title
         self.window = tk.Tk()
         self.window.geometry('800x600')
-        self.window.state("zoomed")
         self.window.title("Tela principal")
+
+        #   Maximize window if sytem is windows
+        if platform.system() == "Windows":
+            self.window.state("zoomed")
+        else:
+            # Maximize window in other systems
+            self.window.attributes('-zoomed', 1)
 
         # List to save recent files
         self.recent_files = []
