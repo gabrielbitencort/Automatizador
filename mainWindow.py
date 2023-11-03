@@ -41,13 +41,13 @@ class MainWindow:
 
         # Archives menu
         self.fileMenu = tk.Menu(self.menuBar, tearoff=0)
-        self.fileMenu.add_command(label="Novo", command=self.new_file)
+        self.fileMenu.add_command(label="Novo", command=self.new_file, accelerator='Alt+Insert')
         self.fileMenu.add_command(label='Abrir...', command=self.open_file)
         self.recent_submenu = tk.Menu(self.fileMenu, tearoff=0)
         self.fileMenu.add_cascade(label='Abrir recentes', menu=self.recent_submenu)
         self.fileMenu.add_command(label='Fechar', command=self.close_file)
-        self.fileMenu.add_command(label='Salvar', command=self.save_file)
-        self.fileMenu.add_command(label='Salvar como...', command=self.save_file_as)
+        self.fileMenu.add_command(label='Salvar', command=self.save_file, accelerator='Ctrl+S')
+        self.fileMenu.add_command(label='Salvar como...', command=self.save_file_as, accelerator='Ctrl+Shift+S')
         self.fileMenu.add_separator()
         self.fileMenu.add_command(label='Configurações', command=open_configWindow)
         self.fileMenu.add_separator()
@@ -81,7 +81,6 @@ class MainWindow:
         self.contacts_file_path = None
 
         self.center_window(1024, 760)
-
 
     def open_contactFile(self):
         contacts_dir = 'Contacts'
@@ -127,7 +126,6 @@ class MainWindow:
                 if self.current_file is not None:
                     print("Enviando email com arquivo: ", self.current_file)
                     for email in emails:
-                        print("Criando mensagem...")
                         # Create MIMEMultipart object for email
                         msg = MIMEMultipart("alternative")
                         msg['From'] = smtpEmail
@@ -139,19 +137,17 @@ class MainWindow:
                             email_body = MIMEText(html_file.read(), 'html', 'utf-8')
                         msg.attach(email_body)
 
-                        print("Conectando ao servidor...")
                         # Initialize SMTP connection
                         server = smtplib.SMTP(smtpServer, smtpPort)
                         server.starttls()
                         server.login(smtpEmail, smtpPassword)
 
-                        print("Enviando para contatos...")
                         # Send email for recipients
                         server.sendmail(smtpEmail, email, msg.as_string())
                         server.quit()
                         print("Email enviado.")
-                    else:
-                        print("Arquivo html não selecionado.")
+                else:
+                    print("Arquivo html não selecionado.")
             except Exception as e:
                 print(f"Erro ao enviar email: {str(e)}")
 
@@ -184,7 +180,6 @@ class MainWindow:
             return recent_files
         except FileNotFoundError:
             print("Erro ao carregar JSON")
-
 
     # Add the recent file to recent files list
     def add_to_recent(self, file_path):
