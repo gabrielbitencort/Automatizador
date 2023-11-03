@@ -13,17 +13,22 @@ def open_configWindow():
 
 class MainWindow:
     def __init__(self, open_registerWindow):
+
+        self.recent_files = self.load_recent_files()
+
         # Create a window with title
         self.window = tk.Tk()
         self.window.geometry('800x600')
         self.window.title("Tela principal")
 
+        self.window.protocol("WM_DELETE_WINDOW", self.save_recent_files_on_exit)
+
         #   Maximize window if sytem is windows
-        # if platform.system() == "Windows":
-        #     self.window.state("zoomed")
-        # else:
-        #     # Maximize window in other systems
-        #     self.window.attributes('-zoomed', 1)
+        if platform.system() == "Windows":
+            self.window.state("zoomed")
+        else:
+            # Maximize window in other systems
+            self.window.attributes('-zoomed', 1)
 
         # List to save recent files
         self.recent_files = []
@@ -77,8 +82,10 @@ class MainWindow:
 
         self.center_window(1024, 760)
 
+
     def open_contactFile(self):
-        contact_path = filedialog.askopenfilename()
+        contacts_dir = 'Contacts'
+        contact_path = filedialog.askopenfilename(initialdir=contacts_dir)
         if contact_path:
             self.contacts = self.load_contacts(contact_path)
             self.sendLabel.config(text=f'enviando para {contact_path}')
@@ -154,12 +161,30 @@ class MainWindow:
 
     # Open files
     def open_file(self):
-        file_path = filedialog.askopenfilename()
+        file_dir = 'Messages'
+        file_path = filedialog.askopenfilename(initialdir=file_dir)
         if file_path:
+            self.add_to_recent(file_path)
             self.current_file = file_path
             self.add_to_recent(file_path)
             self.update_recent_submenu()
             self.load_file_content(file_path)
+            self.save_recent_file()
+
+    def save_recent_file(self):
+        with open('recent_files.json', 'w') as file:
+            json.dump(self.recent_files, file)
+            print("Arquivo recente salvo")
+
+    @staticmethod
+    def load_recent_files():
+        try:
+            with open('recent_files.json', 'r') as file:
+                recent_files = json.load(file)
+            return recent_files
+        except FileNotFoundError:
+            print("Erro ao carregar JSON")
+
 
     # Add the recent file to recent files list
     def add_to_recent(self, file_path):
@@ -214,3 +239,7 @@ class MainWindow:
         x = (screen_width - width) // 2
         y = (screen_height - height) // 2
         self.window.geometry(f"{width}x{height}+{x}+{y}")
+
+    def save_recent_files_on_exit(self):
+        self.save_recent_file()
+        self.window.destroy()
