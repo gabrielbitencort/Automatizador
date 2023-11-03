@@ -1,5 +1,6 @@
 import tkinter as tk
 
+
 class LoginWindow:
     def __init__(self, call_main_window):
         # Create a window with title

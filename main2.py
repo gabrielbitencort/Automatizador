@@ -2,7 +2,7 @@ from loginWindow import LoginWindow
 from mainWindow import MainWindow
 from registerWindow import RegisterWindow
 import tkinter as tk
-import sqlite3, hashlib, os, json
+import sqlite3, hashlib, os
 
 database = 'Automatizador.db'
 
@@ -27,7 +27,7 @@ def hash_password(password, salt=None):
     if salt is None:
         salt = os.urandom(16)   # Generate a random "salt"
 
-    password = password.encode('utf-8') # Converts password string into bytes
+    password = password.encode('utf-8')  # Converts password string into bytes
     password_hash = hashlib.pbkdf2_hmac('sha256', password, salt, 100000)
     return salt, password_hash
 

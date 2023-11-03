@@ -2,6 +2,12 @@ import os
 import platform
 import tkinter as tk
 from tkinter import filedialog
+from configWindow import ConfigWindow
+
+
+def open_configWindow():
+    configWindow = ConfigWindow()
+    configWindow.window.mainloop()
 
 
 class MainWindow:
@@ -37,7 +43,7 @@ class MainWindow:
         self.fileMenu.add_command(label='Salvar', command=self.save_file)
         self.fileMenu.add_command(label='Salvar como...', command=self.save_file_as)
         self.fileMenu.add_separator()
-        self.fileMenu.add_command(label='Configurações')
+        self.fileMenu.add_command(label='Configurações', command=open_configWindow)
         self.fileMenu.add_separator()
         self.fileMenu.add_command(label='Avançado')
         self.fileMenu.add_separator()
