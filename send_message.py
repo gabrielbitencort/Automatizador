@@ -1,11 +1,3 @@
-# Import necessary packages
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-
-# from email.mime.image import MIMEImage
-
-# SMTP Server configs and credential
 smtp_server = 'smtp.gmail.com'
 smtp_port = 587
 username = 'gabrielbiten.henrique@gmail.com'

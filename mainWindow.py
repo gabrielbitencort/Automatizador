@@ -1,7 +1,8 @@
-import os
-import platform
+import os, platform, csv, json, smtplib
 import tkinter as tk
 from tkinter import filedialog
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from configWindow import ConfigWindow
 
 
@@ -18,11 +19,11 @@ class MainWindow:
         self.window.title("Tela principal")
 
         #   Maximize window if sytem is windows
-        if platform.system() == "Windows":
-            self.window.state("zoomed")
-        else:
-            # Maximize window in other systems
-            self.window.attributes('-zoomed', 1)
+        # if platform.system() == "Windows":
+        #     self.window.state("zoomed")
+        # else:
+        #     # Maximize window in other systems
+        #     self.window.attributes('-zoomed', 1)
 
         # List to save recent files
         self.recent_files = []
@@ -66,7 +67,86 @@ class MainWindow:
         self.text_widget = tk.Text(self.window, wrap=tk.WORD, width=200, height=40)
         self.text_widget.pack()
 
+        self.btn_send = tk.Button(self.window, text='ENVIAR EMAIL', command=self.sendEmails, state=tk.DISABLED)
+        self.btn_send.place(x=40, y=700)
+        self.sendLabel = tk.Label(self.window, text='')
+        self.sendLabel.place(x=135, y=700)
+        self.contacts = tk.Button(self.window, text='Selecionar arquivo de contatos', command=self.open_contactFile)
+        self.contacts.place(x=40, y=735)
+        self.contacts_file_path = None
+
         self.center_window(1024, 760)
+
+    def open_contactFile(self):
+        contact_path = filedialog.askopenfilename()
+        if contact_path:
+            self.contacts = self.load_contacts(contact_path)
+            self.sendLabel.config(text=f'enviando para {contact_path}')
+            self.btn_send.config(state=tk.NORMAL)
+
+    @staticmethod
+    def load_contacts(contact_path):
+        names = []
+        emails = []
+
+        with open(contact_path, 'r') as file:
+            reader = csv.reader(file, delimiter=';')
+            for row in reader:
+                if len(row) >= 2:
+                    names.append(row[0])
+                    emails.append(row[1])
+        return names, emails
+
+    @staticmethod
+    def read_smtpConfig():
+        smtpConfig_path = 'smtp.json'
+        if smtpConfig_path:
+            with open(smtpConfig_path, 'r') as file:
+                data = json.load(file)
+                smtpServer = data.get("Server")
+                smtpPort = data.get("Port")
+                smtpEmail = data.get("Email")
+                smtpPassword = data.get("Password")
+            return smtpServer, smtpPort, smtpEmail, smtpPassword
+
+    def sendEmails(self):
+        if self.contacts is not None:
+            smtpServer, smtpPort, smtpEmail, smtpPassword = self.read_smtpConfig()
+            names, emails = self.contacts
+            print(names)
+            print(emails)
+
+            try:
+                if self.current_file is not None:
+                    print("Enviando email com arquivo: ", self.current_file)
+                    for email in emails:
+                        print("Criando mensagem...")
+                        # Create MIMEMultipart object for email
+                        msg = MIMEMultipart("alternative")
+                        msg['From'] = smtpEmail
+                        msg['To'] = ', '.join(email)
+                        msg['Subject'] = 'Teste Automatizador de Emails'
+
+                        # Attach html_file to email body
+                        with open(self.current_file, 'r', encoding='utf-8') as html_file:
+                            email_body = MIMEText(html_file.read(), 'html', 'utf-8')
+                        msg.attach(email_body)
+
+                        print("Conectando ao servidor...")
+                        # Initialize SMTP connection
+                        server = smtplib.SMTP(smtpServer, smtpPort)
+                        server.starttls()
+                        server.login(smtpEmail, smtpPassword)
+
+                        print("Enviando para contatos...")
+                        # Send email for recipients
+                        server.sendmail(smtpEmail, email, msg.as_string())
+                        server.quit()
+                        print("Email enviado.")
+                    else:
+                        print("Arquivo html não selecionado.")
+            except Exception as e:
+                print(f"Erro ao enviar email: {str(e)}")
 
     def new_file(self):
         self.current_file = None
@@ -76,10 +156,10 @@ class MainWindow:
     def open_file(self):
         file_path = filedialog.askopenfilename()
         if file_path:
+            self.current_file = file_path
             self.add_to_recent(file_path)
             self.update_recent_submenu()
             self.load_file_content(file_path)
-            self.current_file = file_path
 
     # Add the recent file to recent files list
     def add_to_recent(self, file_path):
