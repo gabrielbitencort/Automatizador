@@ -1,4 +1,4 @@
-import os, platform, csv, json, smtplib
+import os, platform, csv, json, smtplib, threading
 import tkinter as tk
 from tkinter import filedialog
 from email.mime.text import MIMEText
@@ -122,34 +122,38 @@ class MainWindow:
             print(names)
             print(emails)
 
-            try:
-                if self.current_file is not None:
-                    print("Enviando email com arquivo: ", self.current_file)
-                    for email in emails:
-                        # Create MIMEMultipart object for email
-                        msg = MIMEMultipart("alternative")
-                        msg['From'] = smtpEmail
-                        msg['To'] = ', '.join(email)
-                        msg['Subject'] = 'Teste Automatizador de Emails'
+            if self.current_file is not None:
+                def send_email_func():
+                    try:
+                        print("Enviando email com arquivo: ", self.current_file)
+                        for email in emails:
+                            # Create MIMEMultipart object for email
+                            msg = MIMEMultipart("alternative")
+                            msg['From'] = smtpEmail
+                            msg['To'] = ', '.join(email)
+                            msg['Subject'] = 'Teste Automatizador de Emails'
 
-                        # Attach html_file to email body
-                        with open(self.current_file, 'r', encoding='utf-8') as html_file:
-                            email_body = MIMEText(html_file.read(), 'html', 'utf-8')
-                        msg.attach(email_body)
+                            # Attach html_file to email body
+                            with open(self.current_file, 'r', encoding='utf-8') as html_file:
+                                email_body = MIMEText(html_file.read(), 'html', 'utf-8')
+                            msg.attach(email_body)
 
-                        # Initialize SMTP connection
-                        server = smtplib.SMTP(smtpServer, smtpPort)
-                        server.starttls()
-                        server.login(smtpEmail, smtpPassword)
+                            # Initialize SMTP connection
+                            server = smtplib.SMTP(smtpServer, smtpPort)
+                            server.starttls()
+                            server.login(smtpEmail, smtpPassword)
 
-                        # Send email for recipients
-                        server.sendmail(smtpEmail, email, msg.as_string())
-                        server.quit()
-                        print("Email enviado.")
-                else:
-                    print("Arquivo html não selecionado.")
-            except Exception as e:
-                print(f"Erro ao enviar email: {str(e)}")
+                            # Send email for recipients
+                            server.sendmail(smtpEmail, email, msg.as_string())
+                            server.quit()
+                            print("Email enviado.")
+                    except Exception as e:
+                        print(f"Erro ao enviar email: {str(e)}")
+                # Create a new thread and execute email sending func
+                email_thread = threading.Thread(target=send_email_func)
+                email_thread.start()
+            else:
+                print("Arquivo html não selecionado.")
 
     def new_file(self):
         self.current_file = None
