@@ -13,6 +13,11 @@ def open_configWindow():
     configWindow.window.mainloop()
 
 
+def open_updateWindow():
+    updateWindow = UpdateSoftware()
+    updateWindow.window.mainloop()
+
+
 class MainWindow:
     def __init__(self, open_registerWindow):
 
@@ -68,7 +73,7 @@ class MainWindow:
         # Help menu
         self.helpMenu = tk.Menu(self.menuBar, tearoff=0)
         self.helpMenu.add_command(label="Sobre")
-        self.helpMenu.add_command(label="Procurar por atualizações...")
+        self.helpMenu.add_command(label="Procurar por atualizações...", command=open_updateWindow)
         self.menuBar.add_cascade(label='Ajuda', menu=self.helpMenu)
 
         self.window.config(menu=self.menuBar)
