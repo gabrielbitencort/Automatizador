@@ -12,6 +12,7 @@ class LoginWindow:
         # Create username label and entry
         self.text_name = tk.Label(self.window, text='Nome: ')
         self.input_name = tk.Entry(self.window)
+        self.input_name.focus()
 
         # Create password label and entry
         self.text_passwd = tk.Label(self.window, text='Senha: ')

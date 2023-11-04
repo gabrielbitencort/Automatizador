@@ -1,9 +1,11 @@
 import os, platform, csv, json, smtplib, threading
 import tkinter as tk
+from builtins import FileNotFoundError
 from tkinter import filedialog
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from configWindow import ConfigWindow
+from updateWindow import UpdateSoftware
 
 
 def open_configWindow():
@@ -14,7 +16,8 @@ def open_configWindow():
 class MainWindow:
     def __init__(self, open_registerWindow):
 
-        self.recent_files = self.load_recent_files()
+        self.recent_file_path = 'recent_files.json'
+        self.recent_files = self.load_recent_files(self.recent_file_path)
 
         # Create a window with title
         self.window = tk.Tk()
@@ -65,19 +68,20 @@ class MainWindow:
         # Help menu
         self.helpMenu = tk.Menu(self.menuBar, tearoff=0)
         self.helpMenu.add_command(label="Sobre")
+        self.helpMenu.add_command(label="Procurar por atualizações...")
         self.menuBar.add_cascade(label='Ajuda', menu=self.helpMenu)
 
         self.window.config(menu=self.menuBar)
 
-        self.text_widget = tk.Text(self.window, wrap=tk.WORD, width=200, height=40)
+        self.text_widget = tk.Text(self.window, wrap=tk.WORD, width=160, height=30)
         self.text_widget.pack()
 
         self.btn_send = tk.Button(self.window, text='ENVIAR EMAIL', command=self.sendEmails, state=tk.DISABLED)
-        self.btn_send.place(x=40, y=700)
+        self.btn_send.place(x=40, y=500)
         self.sendLabel = tk.Label(self.window, text='')
-        self.sendLabel.place(x=135, y=700)
+        self.sendLabel.place(x=135, y=500)
         self.contacts = tk.Button(self.window, text='Selecionar arquivo de contatos', command=self.open_contactFile)
-        self.contacts.place(x=40, y=735)
+        self.contacts.place(x=40, y=535)
         self.contacts_file_path = None
 
         self.center_window(1024, 760)
@@ -172,18 +176,34 @@ class MainWindow:
             self.save_recent_file()
 
     def save_recent_file(self):
-        with open('recent_files.json', 'w') as file:
-            json.dump(self.recent_files, file)
-            print("Arquivo recente salvo")
+        try:
+            with open(self.recent_file_path, 'x') as file:
+                json.dump(self.recent_files, file)
+                file.close()
+                print("Arquivo recente salvo")
+        except FileExistsError:
+            with open(self.recent_file_path, 'w') as file:
+                json.dump(self.recent_files, file)
+                file.close()
+                print("Arquivo recente salvo")
+        except PermissionError:
+            print("Erro de permissão ao criar ou salvar JSON")
+        except OSError as e:
+            print(f"Erro ao lidar com o arquivo: {e}")
 
     @staticmethod
-    def load_recent_files():
+    def load_recent_files(recent_file_path):
         try:
-            with open('recent_files.json', 'r') as file:
+            with open(recent_file_path, 'r') as file:
                 recent_files = json.load(file)
+                file.close()
             return recent_files
         except FileNotFoundError:
             print("Erro ao carregar JSON")
+            return []
+        except PermissionError:
+            print("Erro de permissão ao abrir JSON")
+            return []
 
     # Add the recent file to recent files list
     def add_to_recent(self, file_path):
