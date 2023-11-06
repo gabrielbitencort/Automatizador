@@ -29,7 +29,11 @@ class UpdateSoftware:
         # Verify updates
         latest_version = self.check_for_updates()
         if latest_version:
-            self.ask_for_update(latest_version)
+            current_version = 'v1.1.0-beta'
+            if latest_version == current_version:
+                tk.messagebox.showinfo("Atualização Disponivel", "Você já possui a versão mais recente.")
+            else:
+                self.ask_for_update(latest_version)
 
     def check_for_updates(self):
         repo_owner = 'Gabriel-Bitencort'
@@ -72,7 +76,3 @@ class UpdateSoftware:
         x = (screen_width - width) // 2
         y = (screen_height - height) // 2
         self.window.geometry(f"{width}x{height}+{x}+{y}")
-
-
-update = UpdateSoftware()
-update.window.mainloop()
