@@ -2,8 +2,6 @@ import tkinter as tk
 import tkinter.messagebox
 import requests
 import json
-
-
 # import subprocess
 
 
@@ -39,7 +37,7 @@ class UpdateSoftware:
         repo_name = 'Automatizador-V2.0'
         releases_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases'
 
-        headers = {"Authorization": "token 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"}
+        headers = {"Authorization": "token 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"}
 
         try:
             response = requests.get(releases_url, headers=headers)
