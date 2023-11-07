@@ -1,53 +1,57 @@
 import os
-import requests
-# import zipfile
-import py7zr
-import platform
+import zipfile
+import ctypes
+import sys
+from win32com.client import Dispatch
 
-# GitHub latest release URL
-github_repo = 'Gabriel-Bitencort/Automatizador-V2.0'
-github_api_url = f'https://api.github.com/repos/{github_repo}/releases/latest'
-headers = {"Authorization": "token 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"}
 
-# Instalation directory
-install_dir = os.path.join(os.environ['PROGRAMFILES'], 'Automatizador')
+# Verifica se o programa está sendo executado com privilégios de administrador
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
 
-try:
-    # Get the latest release information
-    response = requests.get(github_api_url, headers=headers)
-    response.raise_for_status()
-    data = response.json()
-    latest_release_url = data['assets'][0]['browser_download_url']
-    print(latest_release_url)
 
-    # .7z file name
-    compressed_file = 'Automatizador-v1.1.0-beta.7z'
+# Define o diretório de instalação
+install_dir = os.path.join(os.environ['ProgramFiles'], 'Automatizador')
 
-    # Download .7z file
-    with open(compressed_file, 'wb') as file:
-        file.write(response.content)
+# Nome do arquivo ZIP
+zip_file = 'Automatizador-v1.1.0-beta.zip'
 
-    # unzip file
-    with py7zr.SevenZipFile(compressed_file, 'r') as z:
-        z.extractall(install_dir)
+# Nome do atalho na área de trabalho
+shortcut_name = 'Automatizador.lnk'
 
-    # Verify OS to create a shortcut
-    if platform.system() == 'Windows':
-        import winshell
-        from win32com.client import Dispatch
+# Caminho para o executável após a instalação
+executable_path = os.path.join(install_dir, 'dist', 'Automatizador', 'Automatizador.exe')
 
-        # Create a shortcut
-        desktop = winshell.desktop()
-        shortcut = os.path.join(desktop, "Automatizador.ink")
-        target = os.path.join(install_dir, 'dist', 'Automatizador', 'Automatizador.exe')
-        shell = Dispatch("WScript.Shell")
-        shortcut = shell.CreateShortCut(shortcut)
-        shortcut.Targetpath = target
-        shortcut.WorkngDirectory = os.path.dirname(target)
-        shortcut.save()
 
-    print("Instalação concluida.")
-except requests.exceptions.RequestException as e:
-    print(f"Erro na solicitação HTTP: {e}")
-except Exception as e:
-    print(f"Erro inesperado: {e}")
+def main():
+    # Verifica os privilégios de administrador
+    if is_admin():
+        # Extrai o arquivo ZIP
+        with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+            zip_ref.extractall(install_dir)
+
+        # Cria um atalho na área de trabalho
+        desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+        shortcut_target = executable_path
+        shortcut_path = os.path.join(desktop, shortcut_name)
+        create_shortcut(shortcut_target, shortcut_path)
+
+        print('Instalação concluída.')
+    else:
+        # Se não estiver executando como administrador, solicita elevação de privilégios
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+
+
+# Função para criar um atalho na área de trabalho
+def create_shortcut(target, shortcut):
+    shell = Dispatch("WScript.Shell")
+    shortcut = shell.CreateShortCut(shortcut)
+    shortcut.TargetPath = target
+    shortcut.save()
+
+
+if __name__ == '__main__':
+    main()

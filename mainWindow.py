@@ -1,4 +1,5 @@
 import os, platform, csv, json, smtplib, threading
+import logging
 import tkinter as tk
 from builtins import FileNotFoundError
 from tkinter import filedialog
@@ -139,16 +140,17 @@ class MainWindow:
                             # Create MIMEMultipart object for email
                             msg = MIMEMultipart("alternative")
                             msg['From'] = smtpEmail
-                            msg['To'] = ', '.join(email)
+                            msg['To'] = email
                             msg['Subject'] = 'Teste Automatizador de Emails'
 
                             # Attach html_file to email body
                             with open(self.current_file, 'r', encoding='utf-8') as html_file:
                                 email_body = MIMEText(html_file.read(), 'html', 'utf-8')
                             msg.attach(email_body)
-
+                            logging.basicConfig(level=logging.DEBUG)
                             # Initialize SMTP connection
                             server = smtplib.SMTP(smtpServer, smtpPort)
+                            server.set_debuglevel(1)
                             server.starttls()
                             server.login(smtpEmail, smtpPassword)
 
