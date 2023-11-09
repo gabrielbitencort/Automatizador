@@ -7,6 +7,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from configWindow import ConfigWindow
 from updateWindow import UpdateSoftware
+from managerWindow import ManagerWindow
 
 
 def open_configWindow():
@@ -17,6 +18,11 @@ def open_configWindow():
 def open_updateWindow():
     updateWindow = UpdateSoftware()
     updateWindow.window.mainloop()
+
+
+def open_managerWindow():
+    managerwindow = ManagerWindow()
+    managerwindow.window.mainloop()
 
 
 class MainWindow:
@@ -68,7 +74,7 @@ class MainWindow:
         # Users menu
         self.usersMenu = tk.Menu(self.menuBar, tearoff=0)
         self.usersMenu.add_command(label="Cadastrar", command=open_registerWindow)
-        self.usersMenu.add_command(label="Gerenciar")
+        self.usersMenu.add_command(label="Gerenciar", command=open_managerWindow)
         self.menuBar.add_cascade(label="Usuários", menu=self.usersMenu)
 
         # Help menu

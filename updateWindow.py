@@ -55,6 +55,8 @@ class UpdateSoftware:
                         latest_version = latest_release.get('tag_name')
                         print(f"Atualização encontrada: {latest_version}")
                         return latest_version
+            else:
+                tk.messagebox.showinfo("Erro na atualização", "Não foi possivel se comunicar com o servidor")
         except Exception as e:
             print("Erro ao verificar atualizações: ", str(e))
 

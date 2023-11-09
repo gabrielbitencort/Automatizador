@@ -1,21 +1,9 @@
-import hashlib
-import os
+from passlib.hash import pbkdf2_sha256
+
+passwd = input("Digite a senha: ")
+
+def hash_password(password):
+    return pbkdf2_sha256.using(rounds=8000, salt_size=16).hash(password)
 
 
-def hash_password(password, salt=None):
-    if salt is None:
-        salt = os.urandom(16)  # Gere um "salt" aleatório
-
-    password_hash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
-    return salt, password_hash
-
-
-def generate_password_hash():
-    password = input("Digite a senha: ")
-    salt, password_hash = hash_password(password)
-    print(f"Salt: {salt.hex()}")
-    print(f"Hash da senha: {password_hash.hex()}")
-
-
-if __name__ == "__main__":
-    generate_password_hash()
+print(hash_password(passwd))
