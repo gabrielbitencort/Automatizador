@@ -1,3 +1,4 @@
+import os.path
 import tkinter as tk
 from tkinter import ttk
 import json
@@ -79,9 +80,10 @@ class ConfigWindow:
                 "Password": password
             }
 
-            with open('smtp.json', 'w') as json_file:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            json_path = os.path.join(script_dir, 'smtp.json')
+
+            with open(json_path, 'w') as json_file:
                 json.dump(data, json_file, indent=4)
         else:
             self.configMessage3.config(text='Por favor, preencha todos os campos!')
-
-

@@ -3,6 +3,8 @@ import zipfile
 import ctypes
 import sys
 from win32com.client import Dispatch
+import tkinter as tk
+import tkinter.messagebox
 
 
 # Verifica se o programa está sendo executado com privilégios de administrador
@@ -17,13 +19,13 @@ def is_admin():
 install_dir = os.path.join(os.environ['ProgramFiles'], 'Automatizador')
 
 # Nome do arquivo ZIP
-zip_file = 'Automatizador-v1.1.0-beta.zip'
+zip_file = 'Automatizador-v1.2.0-beta.zip'
 
 # Nome do atalho na área de trabalho
 shortcut_name = 'Automatizador.lnk'
 
 # Caminho para o executável após a instalação
-executable_path = os.path.join(install_dir, 'dist', 'Automatizador', 'Automatizador.exe')
+executable_path = os.path.join(install_dir, 'Automatizador.exe')
 
 
 def main():
@@ -38,7 +40,7 @@ def main():
         shortcut_target = executable_path
         shortcut_path = os.path.join(desktop, shortcut_name)
         create_shortcut(shortcut_target, shortcut_path)
-
+        tk.messagebox.showinfo("Instalador", "Instalação concluida")
         print('Instalação concluída.')
     else:
         # Se não estiver executando como administrador, solicita elevação de privilégios

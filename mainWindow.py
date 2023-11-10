@@ -1,4 +1,9 @@
-import os, platform, csv, json, smtplib, threading
+import os
+import platform
+import csv
+import json
+import smtplib
+import threading
 import logging
 import tkinter as tk
 from builtins import FileNotFoundError
@@ -27,8 +32,8 @@ def open_managerWindow():
 
 class MainWindow:
     def __init__(self, open_registerWindow):
-
-        self.recent_file_path = 'recent_files.json'
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.recent_file_path = os.path.join(script_dir, 'recent_files.json')
         self.recent_files = self.load_recent_files(self.recent_file_path)
 
         # Create a window with title
@@ -121,8 +126,10 @@ class MainWindow:
 
     @staticmethod
     def read_smtpConfig():
-        smtpConfig_path = 'smtp.json'
-        if smtpConfig_path:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        smtpConfig_path = os.path.join(script_dir, 'smtp.json')
+
+        if os.path.exists(smtpConfig_path):
             with open(smtpConfig_path, 'r') as file:
                 data = json.load(file)
                 smtpServer = data.get("Server")
@@ -130,6 +137,8 @@ class MainWindow:
                 smtpEmail = data.get("Email")
                 smtpPassword = data.get("Password")
             return smtpServer, smtpPort, smtpEmail, smtpPassword
+        else:
+            return None
 
     def sendEmails(self):
         if self.contacts is not None:
