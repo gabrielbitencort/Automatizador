@@ -5,6 +5,26 @@ from passlib.hash import pbkdf2_sha256
 
 db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
 
+def check_duplicate_user(name, email):
+    db_manager = DatabaseManager()
+    try:
+        db_manager.connect()
+        # Execute a cunsult to verify if exists a user with same name
+        query = 'SELECT * FROM users WHERE name = %s OR email = %s'
+        data = (name, email)
+        cursor = db_manager.execute_query(query, data)
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            return True
+        else:
+            return False
+    except psycopg2.Error as error:
+        print("Erro ao verificar duplicatas: ", error)
+        return True
+    finally:
+        db_manager.close()
+
 
 def hash_password(password):
     password = password.encode('utf-8')
@@ -64,24 +84,30 @@ class ManagerWindow:
         self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def load_users(self):
-        self.db_manager.connect()
-        self.users_listbox.delete(0, tk.END)
-        cursor = self.db_manager.execute_query("SELECT id, name, email FROM users")
-        if cursor:
-            users = cursor.fetchall()
-            for user in users:
-                self.users_listbox.insert(tk.END, f"{user[0]} - {user[1]} - {user[2]}")
-        self.db_manager.close()
+        try:
+            self.db_manager.connect()
+            self.users_listbox.delete(0, tk.END)
+            cursor = self.db_manager.execute_query("SELECT id, name, email FROM users")
+            if cursor:
+                users = cursor.fetchall()
+                for user in users:
+                    self.users_listbox.insert(tk.END, f"{user[0]} - {user[1]} - {user[2]}")
+            self.db_manager.close()
+        except psycopg2.Error as e:
+            print("Erro ao listar usuários: ", e)
 
     def edit_user(self):
-        selected_user = self.users_listbox.get(tk.ACTIVE)
-        if not selected_user:
-            tk.messagebox.showerror("Erro", "Selecione um usuário para editar.")
-            return
-        user_id = int(selected_user.split(" - ")[0])
-        edit = EditUser(user_id)
-        edit.window.mainloop()
-        print(f"Editando o usuário: {selected_user}")
+        try:
+            selected_user = self.users_listbox.get(tk.ACTIVE)
+            print(f"Editando o usuário: {selected_user}")
+            if not selected_user:
+                tk.messagebox.showerror("Erro", "Selecione um usuário para editar.")
+                return
+            user_id = int(selected_user.split(" - ")[0])
+            edit = EditUser(user_id)
+            edit.window.mainloop()
+        except Exception as e:
+            print("Erro ao tentar editar usuário: ", e)
 
     def delete_user(self):
         selected_user = self.users_listbox.get(tk.ACTIVE)
@@ -149,28 +175,29 @@ class EditUser:
         if password != cpassword:
             tk.messagebox.showerror("Erro", "As senhas não coincidem.")
             return
-
-        try:
-            self.db_manager.connect()
+        if check_duplicate_user(name, email):
+            tk.messagebox.showerror("Erro", "Nome ou email já foram cadastrados.")
+        else:
             password_hash = hash_password(password)
-
-            query = '''UPDATE users SET name = %s, 
-                                        email = %s,
-                                        password_hash = %s 
-                                        WHERE id = %s'''
-            data = (name, email, password_hash, self.user_id)
-            cursor = self.db_manager.execute_query(query, data)
-            if cursor:
-                tk.messagebox.showinfo("Sucesso", "Usuário editado com sucesso.")
-                print("Usuário editado com sucesso.")
-            else:
-                tk.messagebox.showerror("Erro", "Erro ao editar o usuário")
-            # self.window.destroy()
-        except psycopg2.Error as error:
-            tk.messagebox.showerror("Erro", "Erro ao inserir os dados!")
-            print("Erro ao inserir os dados: ", error)
-        finally:
-            self.db_manager.close()
+            try:
+                self.db_manager.connect()
+                query = '''UPDATE users SET name = %s, 
+                                            email = %s,
+                                            password_hash = %s 
+                                            WHERE id = %s'''
+                data = (name, email, password_hash, self.user_id)
+                cursor = self.db_manager.execute_query(query, data)
+                if cursor:
+                    tk.messagebox.showinfo("Sucesso", "Usuário editado com sucesso.")
+                    print("Usuário editado com sucesso.")
+                    self.window.destroy()
+                else:
+                    tk.messagebox.showerror("Erro", "Erro ao editar o usuário")
+            except psycopg2.Error as error:
+                tk.messagebox.showerror("Erro", "Erro ao inserir os dados!")
+                print("Erro ao inserir os dados: ", error)
+            finally:
+                self.db_manager.close()
 
 # manage = ManagerWindow()
 # manage.window.mainloop()
