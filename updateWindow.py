@@ -28,7 +28,7 @@ class UpdateSoftware:
         # Verify updates
         latest_version = self.check_for_updates()
         if latest_version:
-            current_version = 'v1.1.0-beta'
+            current_version = 'v1.2.0-beta'
             if latest_version == current_version:
                 tk.messagebox.showinfo("Atualização Disponivel", "Você já possui a versão mais recente.", parent=self.window)
             else:
@@ -36,7 +36,7 @@ class UpdateSoftware:
 
     def check_for_updates(self):
         repo_owner = 'Gabriel-Bitencort'
-        repo_name = 'Automatizador-V2.0'
+        repo_name = 'Automatizador'
         releases_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases'
 
         headers = {"Authorization": "token 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"}
