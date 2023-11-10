@@ -101,7 +101,7 @@ class ManagerWindow:
             selected_user = self.users_listbox.get(tk.ACTIVE)
             print(f"Editando o usuário: {selected_user}")
             if not selected_user:
-                tk.messagebox.showerror("Erro", "Selecione um usuário para editar.")
+                tk.messagebox.showerror("Erro", "Selecione um usuário para editar.", parent=self.window)
                 return
             user_id = int(selected_user.split(" - ")[0])
             edit = EditUser(user_id)
@@ -110,11 +110,21 @@ class ManagerWindow:
             print("Erro ao tentar editar usuário: ", e)
 
     def delete_user(self):
+        num_users = self.users_listbox.size()
+
+        if num_users == 0:
+            tk.messagebox.showerror("Erro", "Não há usuários para excluir.", parent=self.window)
+            return
+        elif num_users == 1:
+            tk.messagebox.showerror("Erro", "Não é permitido excluir o único usuário.", parent=self.window)
+            return
+
         selected_user = self.users_listbox.get(tk.ACTIVE)
         if not selected_user:
-            tk.messagebox.showerror("Erro", "Selecione um usuário para excluir.")
+            tk.messagebox.showerror("Erro", "Selecione um usuário para excluir.", parent=self.window)
             return
-        confirmed = tk.messagebox.askyesno("Confirmação", f"Tem certeza que deseja excluir o usuário: {selected_user}")
+
+        confirmed = tk.messagebox.askyesno("Confirmação", f"Tem certeza que deseja excluir o usuário: {selected_user}?", parent=self.window)
         if confirmed:
             print(f"Excluindo o usuário: {selected_user}")
             user_id = int(selected_user.split(" - ")[0])
@@ -122,12 +132,14 @@ class ManagerWindow:
             query = "DELETE FROM users WHERE id = %s"
             data = (user_id,)
             cursor = self.db_manager.execute_query(query, data)
+
             if cursor:
-                tk.messagebox.showinfo("Sucesso", f"Usuário {user_id}, excluido com sucesso.")
+                tk.messagebox.showinfo("Sucesso", f"Usuário {user_id}, excluido com sucesso.", parent=self.window)
                 print("Usuário excluido com sucesso")
                 self.load_users()
             else:
-                tk.messagebox.showerror("Erro", "Erro ao excluir o usuário.")
+                tk.messagebox.showerror("Erro", "Erro ao excluir o usuário.", parent=self.window)
+
             self.db_manager.close()
 
     def on_closing(self):
@@ -170,34 +182,36 @@ class EditUser:
         cpassword = self.cpassword_input.get()
 
         if not (name and email and password and cpassword):
-            tk.messagebox.showerror("Erro", "Preencha todos os campos.")
+            tk.messagebox.showerror("Erro", "Preencha todos os campos.", parent=self.window)
             return
         if password != cpassword:
-            tk.messagebox.showerror("Erro", "As senhas não coincidem.")
+            tk.messagebox.showerror("Erro", "As senhas não coincidem.", parent=self.window)
             return
-        if check_duplicate_user(name, email):
-            tk.messagebox.showerror("Erro", "Nome ou email já foram cadastrados.")
-        else:
-            password_hash = hash_password(password)
-            try:
-                self.db_manager.connect()
-                query = '''UPDATE users SET name = %s, 
-                                            email = %s,
-                                            password_hash = %s 
-                                            WHERE id = %s'''
-                data = (name, email, password_hash, self.user_id)
-                cursor = self.db_manager.execute_query(query, data)
-                if cursor:
-                    tk.messagebox.showinfo("Sucesso", "Usuário editado com sucesso.")
-                    print("Usuário editado com sucesso.")
-                    self.window.destroy()
-                else:
-                    tk.messagebox.showerror("Erro", "Erro ao editar o usuário")
-            except psycopg2.Error as error:
-                tk.messagebox.showerror("Erro", "Erro ao inserir os dados!")
-                print("Erro ao inserir os dados: ", error)
-            finally:
-                self.db_manager.close()
+        confirmed = tk.messagebox.askyesno("Confirmação", f"Tem certeza que deseja editar o usuário?", parent=self.window)
+        if confirmed:
+            if check_duplicate_user(name, email):
+                tk.messagebox.showerror("Erro", "Nome ou email já foram cadastrados.", parent=self.window)
+            else:
+                password_hash = hash_password(password)
+                try:
+                    self.db_manager.connect()
+                    query = '''UPDATE users SET name = %s, 
+                                                email = %s,
+                                                password_hash = %s 
+                                                WHERE id = %s'''
+                    data = (name, email, password_hash, self.user_id)
+                    cursor = self.db_manager.execute_query(query, data)
+                    if cursor:
+                        tk.messagebox.showinfo("Sucesso", "Usuário editado com sucesso.", parent=self.window)
+                        print("Usuário editado com sucesso.")
+                        self.window.destroy()
+                    else:
+                        tk.messagebox.showerror("Erro", "Erro ao editar o usuário", parent=self.window)
+                except psycopg2.Error as error:
+                    tk.messagebox.showerror("Erro", "Erro ao inserir os dados!", parent=self.window)
+                    print("Erro ao inserir os dados: ", error)
+                finally:
+                    self.db_manager.close()
 
 # manage = ManagerWindow()
 # manage.window.mainloop()
