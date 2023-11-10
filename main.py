@@ -155,5 +155,5 @@ def userRegister(registerWindow):
 
 
 loginWindow = LoginWindow(call_main_window)
-open_mainWindow()
+# open_mainWindow()
 loginWindow.window.mainloop()

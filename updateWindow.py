@@ -2,6 +2,8 @@ import tkinter as tk
 import tkinter.messagebox
 import requests
 import json
+
+
 # import subprocess
 
 
@@ -57,8 +59,10 @@ class UpdateSoftware:
                         return latest_version
             else:
                 tk.messagebox.showinfo("Erro na atualização", "Não foi possivel se comunicar com o servidor")
+                self.close()
         except Exception as e:
             print("Erro ao verificar atualizações: ", str(e))
+            self.close()
 
         return None
 
@@ -67,6 +71,9 @@ class UpdateSoftware:
                                            f"Uma atualização ({latest_version}) está disponivel. Deseja atualizar?")
         if result == 'yes':
             print("Atualizando...")
+
+    def close(self):
+        self.window.destroy()
 
     # Centralize the window
     def center_window(self, width, height):

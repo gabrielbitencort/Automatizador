@@ -1,9 +1,10 @@
-from passlib.hash import pbkdf2_sha256
+import psycopg2
 
-passwd = input("Digite a senha: ")
+db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
 
-def hash_password(password):
-    return pbkdf2_sha256.using(rounds=8000, salt_size=16).hash(password)
-
-
-print(hash_password(passwd))
+conn = psycopg2.connect(db_config)
+try:
+    if conn:
+        print("Conectado")
+except psycopg2.Error as e:
+    print("Erro: ", e)

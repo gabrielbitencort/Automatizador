@@ -4,6 +4,7 @@ import psycopg2
 
 db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
 
+
 class DatabaseManager:
     def __init__(self):
         self.conn = None
@@ -49,7 +50,7 @@ class ManagerWindow:
         self.window.geometry("600x500")
         self.window.title("Gerenciador de Usuários")
 
-        self.users_listbox = tk.Listbox(self.window)
+        self.users_listbox = tk.Listbox(self.window, width=50, height=20)
         self.users_listbox.pack()
 
         self.edit_button = tk.Button(self.window, text="Editar Usuário", command=self.edit_user)
@@ -59,6 +60,8 @@ class ManagerWindow:
         self.delete_button.pack()
 
         self.load_users()
+
+        self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def load_users(self):
         self.db_manager.connect()
@@ -88,12 +91,15 @@ class ManagerWindow:
             self.db_manager.connect()
             if self.db_manager.delete_user(user_id):
                 tk.messagebox.showinfo("Sucesso", f"Usuário {user_id}, excluido com sucesso.")
-                self.load_users()
                 print("Usuário excluido com sucesso")
+                self.load_users()
             else:
                 tk.messagebox.showerror("Erro", "Erro ao excluir o usuário.")
-        self.db_manager.close()
+            self.db_manager.close()
 
+    def on_closing(self):
+        self.db_manager.close()
+        self.window.destroy()
 
 manage = ManagerWindow()
 manage.window.mainloop()
