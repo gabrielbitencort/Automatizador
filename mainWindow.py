@@ -133,7 +133,7 @@ class MainWindow:
         try:
             conn = psycopg2.connect(db_config)
             cursor = conn.cursor()
-            query = 'SELECT * FROM smtp'
+            query = 'SELECT server, port, email, password FROM smtp'
             cursor.execute(query)
             smtp_data = cursor.fetchone()
 

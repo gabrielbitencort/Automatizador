@@ -6,5 +6,11 @@ conn = psycopg2.connect(db_config)
 try:
     if conn:
         print("Conectado")
+        try:
+            cursor = conn.cursor()
+            cursor.execute('DELETE FROM smtp')
+            print("Deletado")
+        except psycopg2.Error as e:
+            print("Erro: ", e)
 except psycopg2.Error as e:
     print("Erro: ", e)
