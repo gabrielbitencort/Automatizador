@@ -1,7 +1,8 @@
-import os.path
 import tkinter as tk
 from tkinter import ttk
-import json
+import psycopg2
+
+db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
 
 
 class ConfigWindow:
@@ -47,8 +48,10 @@ class ConfigWindow:
         self.smtpPassword = tk.Label(self.smtpTab, text='Senha: ')
         self.passwdInput = tk.Entry(self.smtpTab, show='*')
 
-        self.btn_save = tk.Button(self.smtpTab, text='SALVAR', command=self.save_settings)
+        self.btn_save = tk.Button(self.smtpTab, text='SALVAR',width=10, height=1, command=self.save_settings)
         self.configMessage3 = tk.Label(self.smtpTab, text='')
+
+        self.btn_cancel = tk.Button(self.smtpTab, text='CANCELAR',width=10, height=1, command=self.cancel)
 
         # smtpTab widgets position
         self.smtpTitle.pack(padx=10, pady=10)
@@ -60,30 +63,70 @@ class ConfigWindow:
         self.emailInput.place(x=70, y=75)
         self.smtpPassword.place(x=10, y=100)
         self.passwdInput.place(x=70, y=100)
-        self.btn_save.place(x=270, y=150)
+        self.btn_save.place(x=190, y=150)
+        self.btn_cancel.place(x=320, y=150)
         self.configMessage3.place(x=10, y=185)
 
         self.notebook.pack(expand=True, fill="both")
 
+    def cancel(self):
+        input_fields = [self.serverInput, self.portInput, self.emailInput, self.passwdInput]
+        for entry in input_fields:
+            entry.delete(0, tk.END)
+
+    @staticmethod
+    def create_smtp_table():
+        conn = None
+        try:
+            conn = psycopg2.connect(db_config)
+            cursor = conn.cursor()
+            cursor.execute('''CREATE TABLE IF NOT EXISTS smtp (
+                                       server TEXT, 
+                                       port TEXT,
+                                       email TEXT, 
+                                       password TEXT
+                                       )''')
+            conn.commit()
+            print("Tabela criada ou já existe.")
+        except psycopg2.Error as error:
+            print("Erro ao criar a tabela smtp: ", error)
+        finally:
+            if conn is not None:
+                conn.close()
+
     def save_settings(self):
-        server = self.serverInput.get()
-        port = self.portInput.get()
-        email = self.emailInput.get()
-        password = self.passwdInput.get()
+        self.create_smtp_table()
+        smtpServer = self.serverInput.get()
+        smtpPort = self.portInput.get()
+        smtpEmail = self.emailInput.get()
+        smtpPassword = self.passwdInput.get()
 
-        if server and port and email and password:
-            self.configMessage3.config(text='Configuração salva com sucesso.')
-            data = {
-                "Server": server,
-                "Port": port,
-                "Email": email,
-                "Password": password
-            }
+        if smtpServer and smtpPort and smtpEmail and smtpPassword:
+            conn = None
+            try:
+                conn = psycopg2.connect(db_config)
+                cursor = conn.cursor()
+                query = 'SELECT * FROM smtp WHERE server = %s'
+                data = (smtpServer,)
+                cursor.execute(query, data)
+                existing_data = cursor.fetchone()
 
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            json_path = os.path.join(script_dir, 'smtp.json')
-
-            with open(json_path, 'w') as json_file:
-                json.dump(data, json_file, indent=4)
+                if existing_data:
+                    # Se já existir, atualiza dados
+                    query = "UPDATE smtp SET server = %s, port = %s, email = %s, password = %s"
+                    data = (smtpServer, smtpPort, smtpEmail, smtpPassword)
+                    cursor.execute(query, data)
+                else:
+                    # Se não existir, criar nova entrada
+                    query = "INSERT INTO smtp (server, port, email, password) VALUES (%s, %s, %s, %s)"
+                    data = (smtpServer, smtpPort, smtpEmail, smtpPassword)
+                    cursor.execute(query, data)
+                conn.commit()
+                print("Dados SMTP inseridos ou atualizados com sucesso.")
+            except psycopg2.Error as e:
+                print("Erro ao inserir ou atualizar dados SMTP na tabela: ", e)
+            finally:
+                if conn is not None:
+                    conn.close()
         else:
             self.configMessage3.config(text='Por favor, preencha todos os campos!')

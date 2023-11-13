@@ -1,5 +1,5 @@
 import os
-import platform
+# import platform
 import csv
 import json
 import smtplib
@@ -10,9 +10,14 @@ from builtins import FileNotFoundError
 from tkinter import filedialog
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
+import psycopg2
+
 from configWindow import ConfigWindow
 from updateWindow import UpdateSoftware
 from managerWindow import ManagerWindow
+
+db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
 
 
 def open_configWindow():
@@ -43,11 +48,11 @@ class MainWindow:
         self.window.protocol("WM_DELETE_WINDOW", self.save_recent_files_on_exit)
 
         #   Maximize window if sytem is windows
-        if platform.system() == "Windows":
-            self.window.state("zoomed")
-        else:
-            # Maximize window in other systems
-            self.window.attributes('-zoomed', 1)
+        # if platform.system() == "Windows":
+        #     self.window.state("zoomed")
+        # else:
+        #     # Maximize window in other systems
+        #     self.window.attributes('-zoomed', 1)
 
         # Current file name
         self.current_file = None
@@ -124,23 +129,27 @@ class MainWindow:
         return names, emails
 
     def read_smtpConfig(self):
-        self.script_dir = os.path.dirname(os.path.abspath(__file__))
-        smtpConfig_path = os.path.join(self.script_dir, 'smtp.json')
+        conn = None
+        try:
+            conn = psycopg2.connect(db_config)
+            cursor = conn.cursor()
+            query = 'SELECT * FROM smtp'
+            cursor.execute(query)
+            smtp_data = cursor.fetchone()
 
-        if os.path.exists(smtpConfig_path):
-            with open(smtpConfig_path, 'r') as file:
-                data = json.load(file)
-                smtpServer = data.get("Server")
-                smtpPort = data.get("Port")
-                smtpEmail = data.get("Email")
-                smtpPassword = data.get("Password")
-            return smtpServer, smtpPort, smtpEmail, smtpPassword
-        else:
-            return None
+            if smtp_data:
+                self.smtpServer, self.smtpPort, self.smtpEmail, self.smtpPassword = smtp_data
+            else:
+                print("Nenhuma configuração SMTP encontrada no banco de dados.")
+        except psycopg2.Error as e:
+            print("Erro ao consultar tabela: ", e)
+        finally:
+            if conn is not None:
+                conn.close()
 
     def sendEmails(self):
         if self.contacts is not None:
-            smtpServer, smtpPort, smtpEmail, smtpPassword = self.read_smtpConfig()
+            self.read_smtpConfig()
             names, emails = self.contacts
             print(names)
             print(emails)
@@ -152,7 +161,7 @@ class MainWindow:
                         for email in emails:
                             # Create MIMEMultipart object for email
                             msg = MIMEMultipart("alternative")
-                            msg['From'] = smtpEmail
+                            msg['From'] = self.smtpEmail
                             msg['To'] = email
                             msg['Subject'] = 'Teste Automatizador de Emails'
 
@@ -160,15 +169,15 @@ class MainWindow:
                             with open(self.current_file, 'r', encoding='utf-8') as html_file:
                                 email_body = MIMEText(html_file.read(), 'html', 'utf-8')
                             msg.attach(email_body)
-                            logging.basicConfig(level=logging.DEBUG)
+                            # logging.basicConfig(level=logging.DEBUG)
                             # Initialize SMTP connection
-                            server = smtplib.SMTP(smtpServer, smtpPort)
+                            server = smtplib.SMTP(self.smtpServer, self.smtpPort)
                             server.set_debuglevel(1)
                             server.starttls()
-                            server.login(smtpEmail, smtpPassword)
+                            server.login(self.smtpEmail, self.smtpPassword)
 
                             # Send email for recipients
-                            server.sendmail(smtpEmail, email, msg.as_string())
+                            server.sendmail(self.smtpEmail, email, msg.as_string())
                             server.quit()
                             print("Email enviado.")
                     except Exception as e:
