@@ -33,8 +33,7 @@ def open_managerWindow():
 class MainWindow:
     def __init__(self, open_registerWindow):
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
-        self.recent_file_path = os.path.join(script_dir, 'recent_files.json')
-        self.recent_files = self.load_recent_files(self.recent_file_path)
+        self.recent_file_path = os.path.join(self.script_dir, 'recent_files.json')
 
         # Create a window with title
         self.window = tk.Tk()
@@ -49,9 +48,6 @@ class MainWindow:
         else:
             # Maximize window in other systems
             self.window.attributes('-zoomed', 1)
-
-        # List to save recent files
-        self.recent_files = []
 
         # Current file name
         self.current_file = None
@@ -103,6 +99,9 @@ class MainWindow:
 
         self.center_window(1024, 760)
 
+        self.recent_files = self.load_recent_files(self.recent_file_path)
+        self.update_recent_submenu()
+
     def open_contactFile(self):
         contacts_dir = 'Contacts'
         contact_path = filedialog.askopenfilename(initialdir=contacts_dir)
@@ -124,10 +123,9 @@ class MainWindow:
                     emails.append(row[1])
         return names, emails
 
-    @staticmethod
-    def read_smtpConfig():
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        smtpConfig_path = os.path.join(script_dir, 'smtp.json')
+    def read_smtpConfig(self):
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        smtpConfig_path = os.path.join(self.script_dir, 'smtp.json')
 
         if os.path.exists(smtpConfig_path):
             with open(smtpConfig_path, 'r') as file:
@@ -199,27 +197,22 @@ class MainWindow:
 
     def save_recent_file(self):
         try:
-            with open(self.recent_file_path, 'x') as file:
-                json.dump(self.recent_files, file)
-                file.close()
-                print("Arquivo recente salvo")
-        except FileExistsError:
             with open(self.recent_file_path, 'w') as file:
                 json.dump(self.recent_files, file)
-                file.close()
-                print("Arquivo recente salvo")
-        except PermissionError:
-            print("Erro de permissão ao criar ou salvar JSON")
-        except OSError as e:
-            print(f"Erro ao lidar com o arquivo: {e}")
+                print(f"Arquivo recente salvo: {self.recent_files}")
+        except Exception as e:
+            print(f"Erro ao salvar arquivos recentes: {e}")
 
     @staticmethod
     def load_recent_files(recent_file_path):
         try:
             with open(recent_file_path, 'r') as file:
-                recent_files = json.load(file)
-                file.close()
-            return recent_files
+                # Verifica se o arquivo não está vazio
+                if os.path.getsize(recent_file_path) > 0:
+                    recent_files = json.load(file)
+                else:
+                    recent_files = []
+                return recent_files
         except FileNotFoundError:
             print("Erro ao carregar JSON")
             return []
@@ -237,8 +230,7 @@ class MainWindow:
         self.recent_submenu.delete(0, tk.END)
         for file_path in self.recent_files:
             base_name = os.path.basename(file_path)
-            self.recent_submenu.add_command(label=base_name,
-                                            command=lambda path=file_path: self.open_recent(path))
+            self.recent_submenu.add_command(label=base_name, command=lambda path=file_path: self.open_recent(path))
 
     # Open recent files
     def open_recent(self, file_path):
@@ -247,7 +239,7 @@ class MainWindow:
 
     def load_file_content(self, file_path):
         try:
-            with open(file_path, 'r') as file:
+            with open(file_path, 'r', encoding='utf-8') as file:
                 content = file.read()
                 self.text_widget.delete(1.0, tk.END)
                 self.text_widget.insert(tk.END, content)
