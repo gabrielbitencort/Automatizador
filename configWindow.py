@@ -48,10 +48,10 @@ class ConfigWindow:
         self.smtpPassword = tk.Label(self.smtpTab, text='Senha: ')
         self.passwdInput = tk.Entry(self.smtpTab, show='*')
 
-        self.btn_save = tk.Button(self.smtpTab, text='SALVAR',width=10, height=1, command=self.save_settings)
+        self.btn_save = tk.Button(self.smtpTab, text='SALVAR', width=10, height=1, command=self.save_settings)
         self.configMessage3 = tk.Label(self.smtpTab, text='')
 
-        self.btn_cancel = tk.Button(self.smtpTab, text='CANCELAR',width=10, height=1, command=self.cancel)
+        self.btn_cancel = tk.Button(self.smtpTab, text='CANCELAR', width=10, height=1, command=self.cancel)
 
         # smtpTab widgets position
         self.smtpTitle.pack(padx=10, pady=10)
@@ -81,11 +81,12 @@ class ConfigWindow:
             conn = psycopg2.connect(db_config)
             cursor = conn.cursor()
             cursor.execute('''CREATE TABLE IF NOT EXISTS smtp (
-                                       server TEXT, 
-                                       port TEXT,
-                                       email TEXT, 
-                                       password TEXT
-                                       )''')
+                                    id SERIAL PRIMARY KEY,
+                                    server TEXT, 
+                                    port TEXT,
+                                    email TEXT, 
+                                    password TEXT
+                                    )''')
             conn.commit()
             print("Tabela criada ou já existe.")
         except psycopg2.Error as error:
@@ -106,27 +107,32 @@ class ConfigWindow:
             try:
                 conn = psycopg2.connect(db_config)
                 cursor = conn.cursor()
-                query = 'SELECT * FROM smtp WHERE server = %s'
-                data = (smtpServer,)
-                cursor.execute(query, data)
-                existing_data = cursor.fetchone()
 
-                if existing_data:
+                query_check = 'SELECT id FROM smtp WHERE server = %s'
+                data_check = (smtpServer,)
+                cursor.execute(query_check, data_check)
+                existing_id = cursor.fetchone()
+
+                if existing_id:
                     # Se já existir, atualiza dados
-                    query = "UPDATE smtp SET server = %s, port = %s, email = %s, password = %s"
-                    data = (smtpServer, smtpPort, smtpEmail, smtpPassword)
-                    cursor.execute(query, data)
+                    query_update = "UPDATE smtp SET server = %s, port = %s, email = %s, password = %s WHERE id = %s"
+                    data_update = (smtpServer, smtpPort, smtpEmail, smtpPassword, existing_id[0])
+                    cursor.execute(query_update, data_update)
                 else:
                     # Se não existir, criar nova entrada
-                    query = "INSERT INTO smtp (server, port, email, password) VALUES (%s, %s, %s, %s)"
-                    data = (smtpServer, smtpPort, smtpEmail, smtpPassword)
-                    cursor.execute(query, data)
+                    query_insert = "INSERT INTO smtp (server, port, email, password) VALUES (%s, %s, %s, %s)"
+                    data_insert = (smtpServer, smtpPort, smtpEmail, smtpPassword)
+                    cursor.execute(query_insert, data_insert)
+
                 conn.commit()
                 print("Dados SMTP inseridos ou atualizados com sucesso.")
             except psycopg2.Error as e:
                 print("Erro ao inserir ou atualizar dados SMTP na tabela: ", e)
             finally:
-                if conn is not None:
-                    conn.close()
+                try:
+                    if conn is not None:
+                        conn.close()
+                except psycopg2.Error as e:
+                    print("Erro ao fechar a conexão: ", e)
         else:
             self.configMessage3.config(text='Por favor, preencha todos os campos!')
