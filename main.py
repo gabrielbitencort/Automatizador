@@ -154,6 +154,7 @@ def userRegister(registerWindow):
         registerWindow.text_message.config(text='Por favor, preencha todos os campos!')
 
 
-loginWindow = LoginWindow(call_main_window)
-# open_mainWindow()
-loginWindow.window.mainloop()
+if __name__ == '__main__':
+    loginWindow = LoginWindow(call_main_window)
+    # open_mainWindow()
+    loginWindow.window.mainloop()

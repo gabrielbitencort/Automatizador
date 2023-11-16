@@ -4,7 +4,7 @@ import csv
 import json
 import smtplib
 import threading
-import logging
+# import logging
 import tkinter as tk
 from builtins import FileNotFoundError
 from tkinter import filedialog
@@ -182,6 +182,7 @@ class MainWindow:
                             print("Email enviado.")
                     except Exception as e:
                         print(f"Erro ao enviar email: {str(e)}")
+
                 # Create a new thread and execute email sending func
                 email_thread = threading.Thread(target=send_email_func)
                 email_thread.start()

@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
+import tkinter.messagebox
 import psycopg2
+# import base64
 
 db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
 
@@ -104,28 +106,35 @@ class ConfigWindow:
 
         if smtpServer and smtpPort and smtpEmail and smtpPassword:
             conn = None
+            # email_encode = base64.b64encode(smtpEmail.encode('utf-8')).decode('utf-8')
+            # passwd_encode = base64.b64encode(smtpPassword.encode('utf-8')).decode('utf-8')
             try:
                 conn = psycopg2.connect(db_config)
                 cursor = conn.cursor()
 
-                query_check = 'SELECT id FROM smtp WHERE server = %s'
+                query_check = 'SELECT id FROM smtp WHERE LOWER(server) = LOWER(%s)'
                 data_check = (smtpServer,)
                 cursor.execute(query_check, data_check)
                 existing_id = cursor.fetchone()
 
+                print(f"Existing ID: {existing_id}")
+
                 if existing_id:
                     # Se já existir, atualiza dados
+                    print("Updating existing entry.")
                     query_update = "UPDATE smtp SET server = %s, port = %s, email = %s, password = %s WHERE id = %s"
                     data_update = (smtpServer, smtpPort, smtpEmail, smtpPassword, existing_id[0])
                     cursor.execute(query_update, data_update)
                 else:
                     # Se não existir, criar nova entrada
+                    print("Creating new entry.")
                     query_insert = "INSERT INTO smtp (server, port, email, password) VALUES (%s, %s, %s, %s)"
                     data_insert = (smtpServer, smtpPort, smtpEmail, smtpPassword)
                     cursor.execute(query_insert, data_insert)
 
                 conn.commit()
                 print("Dados SMTP inseridos ou atualizados com sucesso.")
+                tk.messagebox.showinfo("Sucesso", "Informações atualizadas com sucesso.", parent=self.window)
             except psycopg2.Error as e:
                 print("Erro ao inserir ou atualizar dados SMTP na tabela: ", e)
             finally:
