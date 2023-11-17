@@ -52,19 +52,26 @@ class Installer:
         self.tab1 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab1)
 
+        # Criar e adicionar a aba de Licença de Uso
+        self.tab2 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab2)
+
         self.create_introduction_tab()
 
         # Frame com botões
         self.frame_btn = tk.Frame(self.window, background='#CCCCCC')
         self.frame_btn.grid(row=1, column=0, sticky='ew')
+        self.frame_btn.columnconfigure(0, weight=1)
+
+        self.btn_back = tk.Button(self.frame_btn, text="< Voltar", width=10, command=self.go_back)
+        self.btn_back.grid(row=0, column=1, padx=1, pady=6)
+        self.btn_back.grid_remove()
+
+        self.btn_next = tk.Button(self.frame_btn, text="Avançar >", width=10, command=self.next_tab)
+        self.btn_next.grid(row=0, column=2, padx=10, pady=6)
 
         self.btn_cancel = tk.Button(self.frame_btn, text="Cancelar", width=10, command=self.cancel)
-        self.btn_cancel.pack(side='right', padx=10, pady=6)
-        self.btn_next = tk.Button(self.frame_btn, text="Avançar >", width=10, command=self.next_tab)
-        self.btn_next.pack(side='right', padx=10, pady=6)
-        self.btn_back = tk.Button(self.frame_btn, text="< Voltar", width=10, command=self.go_back)
-        self.btn_back.pack(side='right', padx=1, pady=6)
-        self.btn_back.grid_remove()
+        self.btn_cancel.grid(row=0, column=3, padx=10, pady=6)
 
         # Configurar grid para expandir conforme a janela é redimensionada
         self.window.grid_rowconfigure(0, weight=1)
@@ -78,12 +85,12 @@ class Installer:
         self.frame_title = tk.Frame(self.tab1)
         self.frame_title.grid(row=0, column=0, sticky='nsew')
 
+        self.title = tk.Label(self.frame_title, text="Bem-vindo ao Assistente de Instalação do Automatizador")
+        self.title.pack(side='top', fill='both', padx=10, pady=20)
+
         # Frame com texto
         self.frame_text = tk.Frame(self.tab1)
         self.frame_text.grid(row=1, column=0, sticky='nsew')
-
-        self.title = tk.Label(self.frame_title, text="Bem-vindo ao Assistente de Instalação do Automatizador")
-        self.title.pack(side='top', fill='both', padx=10, pady=20)
 
         self.text = tk.Label(self.frame_text, text="Este Assistente vai instalar o Automatizador no seu computador.\n\n"
                                                    "Recomenda-se fechar todos os outros programas antes de continuar.\n\n"
@@ -92,7 +99,15 @@ class Installer:
         self.text.pack(side='top', padx=10, pady=10, anchor='w')
 
     def create_license_agreement(self):
-        pass
+        # Frame com titulo
+        self.frame_title = tk.Frame(self.tab2)
+        self.frame_title.grid(row=0, column=0, sticky='nsew')
+
+        self.title1 = tk.Label(self.frame_title, text="Contrato de Licença de Uso")
+        self.title1.pack(side='top', fill='both', padx=10, pady=10)
+
+        self.title2 = tk.Label(self.frame_title, text="Por favor, leia as seguintes informações importantes antes de continuar.")
+        self.title2.pack(side='top', fill='both', padx=10, pady=10)
 
     def next_tab(self):
         # Lógica para mudar de aba
