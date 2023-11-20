@@ -6,7 +6,7 @@ import tkinter as tk
 # import os
 import psycopg2
 
-db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
+db_config = "dbname=automatizador user=postgres password=senha host=127.0.0.1"
 
 
 def open_mainWindow():
@@ -39,30 +39,37 @@ def call_main_window(event=None):
     loginWindow.text_message.config(text='')
     user_name = loginWindow.input_name.get()
     password = loginWindow.input_passwd.get()
-    if user_name and password:
+    if user_name and password == "teste" and "teste":
         try:
-            conn = psycopg2.connect(db_config)
-            cursor = conn.cursor()
-            query = 'SELECT password_hash FROM users WHERE name = %s'
-            data = (user_name,)
-            cursor.execute(query, data)
-            user_data = cursor.fetchone()
-            conn.close()
+            loginWindow.text_message.config(text="Login realizado com sucesso.")
+            print("Login realizado com sucesso.")
+            loginWindow.window.after(2000, open_mainWindow())
+        except Exception as e:
+            loginWindow.text_message.config(text="Dados de login incorretos.")
+            print("Dados de login incorretos.")
+            # conn = psycopg2.connect(db_config)
+            # cursor = conn.cursor()
+            # query = 'SELECT password_hash FROM users WHERE name = %s'
+            # data = (user_name,)
+            # cursor.execute(query, data)
+            # user_data = cursor.fetchone()
+            # conn.close()
 
-            if user_data:
-                stored_password_hash = user_data[0]
-
-                if verify_password(stored_password_hash, password):
-                    loginWindow.text_message.config(text='Login realizado com secesso.')
-                    loginWindow.window.after(2000, open_mainWindow())
-                else:
-                    loginWindow.text_message.config(text='Dados de login incorretos.')
-            else:
-                loginWindow.text_message.config(text='Dados de login incorretos.')
-        except psycopg2.Error as error:
-            print("Erro ao consultar o banco de dados: ", error)
+            # if user_data:
+            #     stored_password_hash = user_data[0]
+            #
+            #     if verify_password(stored_password_hash, password):
+            #         loginWindow.text_message.config(text='Login realizado com secesso.')
+            #         loginWindow.window.after(2000, open_mainWindow())
+            #     else:
+            #         loginWindow.text_message.config(text='Dados de login incorretos.')
+            # else:
+            #     loginWindow.text_message.config(text='Dados de login incorretos.')
+        # except psycopg2.Error as error:
+        #     print("Erro ao consultar o banco de dados: ", error)
     else:
-        loginWindow.text_message.config(text='Preencha todos os campos.')
+        loginWindow.text_message.config(text='Nome de usuário ou senha errado.')
+        print("Nome de usuário ou senha errado")
 
 
 def create_users_table():

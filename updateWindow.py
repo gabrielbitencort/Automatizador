@@ -39,10 +39,8 @@ class UpdateSoftware:
         repo_name = 'Automatizador'
         releases_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/releases'
 
-        headers = {"Authorization": "token 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"}
-
         try:
-            response = requests.get(releases_url, headers=headers)
+            response = requests.get(releases_url)
             print("Procurando atualização...")
             print("Status da resposta: ", response.status_code)
             if response.status_code == 200:
@@ -58,7 +56,7 @@ class UpdateSoftware:
                         print(f"Atualização encontrada: {latest_version}")
                         return latest_version
             else:
-                tk.messagebox.showinfo("Erro na atualização", "Não foi possivel se comunicar com o servidor", parent=self.window)
+                tk.messagebox.showinfo("Erro na atualização", "Não foi possível se comunicar com o servidor", parent=self.window)
                 self.close()
         except Exception as e:
             print("Erro ao verificar atualizações: ", str(e))
@@ -68,7 +66,7 @@ class UpdateSoftware:
 
     def ask_for_update(self, latest_version):
         result = tk.messagebox.askquestion("Atualização Disponivel",
-                                           f"Uma atualização ({latest_version}) está disponivel. Deseja atualizar?", parent=self.window)
+                                           f"Uma atualização ({latest_version}) está disponível. Deseja atualizar?", parent=self.window)
         if result == 'yes':
             print("Atualizando...")
 

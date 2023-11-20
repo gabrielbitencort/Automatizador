@@ -1,6 +1,6 @@
 import psycopg2
 
-db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
+db_config = "dbname=automatizador user=postgres password=senha host=127.0.0.1"
 
 conn = psycopg2.connect(db_config)
 try:

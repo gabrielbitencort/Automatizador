@@ -3,7 +3,7 @@ import tkinter.messagebox
 import psycopg2
 from passlib.hash import pbkdf2_sha256
 
-db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
+db_config = "dbname=automatizador user=postgres password=senha host=127.0.0.1"
 
 def check_duplicate_user(name, email):
     db_manager = DatabaseManager()
