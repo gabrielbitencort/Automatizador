@@ -1,16 +1,21 @@
+from settings import getDatabaseUrl
 import psycopg2
 
-db_config = "dbname=automatizador user=postgres password=senha host=127.0.0.1"
+db_config = getDatabaseUrl()
 
-conn = psycopg2.connect(db_config)
-try:
-    if conn:
-        print("Conectado")
-        try:
-            cursor = conn.cursor()
-            cursor.execute('DELETE FROM smtp')
-            print("Deletado")
-        except psycopg2.Error as e:
-            print("Erro: ", e)
-except psycopg2.Error as e:
-    print("Erro: ", e)
+def testConection():
+    try:
+        # conecta ao banco de dados
+        conn = psycopg2.connect(db_config)
+
+        # criar um cursor
+        cursor = conn.cursor()
+
+        # fecha o cursor e a conexão
+        cursor.close()
+        conn.close()
+    except psycopg2.Error as e:
+        print(f"Erro: {e}")
+
+
+testConection()

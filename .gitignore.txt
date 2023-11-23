@@ -1,3 +1,0 @@
-# ignore files
-.idea/
-settings.env

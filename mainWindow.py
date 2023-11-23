@@ -17,7 +17,7 @@ from configWindow import ConfigWindow
 from updateWindow import UpdateSoftware
 from managerWindow import ManagerWindow
 
-db_config = "dbname=automatizador user=postgres password=senha host=127.0.0.1"
+db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
 
 
 def open_configWindow():
@@ -167,17 +167,18 @@ class MainWindow:
 
                             # Attach html_file to email body
                             with open(self.current_file, 'r', encoding='utf-8') as html_file:
-                                email_body = MIMEText(html_file.read(), 'html', 'utf-8')
+                                email_body = MIMEText(html_file.read().replace("=", "@"), 'html', 'utf-8')
                             msg.attach(email_body)
                             # logging.basicConfig(level=logging.DEBUG)
                             # Initialize SMTP connection
                             server = smtplib.SMTP(self.smtpServer, self.smtpPort)
                             server.set_debuglevel(1)
-                            server.starttls()
+                            server.ehlo()
+                            # server.starttls()
                             server.login(self.smtpEmail, self.smtpPassword)
 
                             # Send email for recipients
-                            server.sendmail(self.smtpEmail, email, msg.as_string())
+                            server.sendmail(self.smtpEmail.replace("=", "@"), email.replace("=", "@"), msg.as_string())
                             server.quit()
                             print("Email enviado.")
                     except Exception as e:

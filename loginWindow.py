@@ -20,7 +20,7 @@ class LoginWindow:
         self.input_passwd.bind("<Return>", call_main_window)
 
         # Create a login button
-        self.btn_login = tk.Button(self.window, text='ENTRAR', command=call_main_window)
+        self.btn_login = tk.Button(self.window, text='ENTRAR', command=call_main_window, width=10)
 
         # Create a messages label
         self.text_message = tk.Label(self.window, text='')
@@ -32,7 +32,7 @@ class LoginWindow:
         self.text_passwd.place(x=10, y=35)
         self.input_passwd.place(x=60, y=35)
 
-        self.btn_login.place(x=85, y=60)
+        self.btn_login.place(x=75, y=60)
 
         self.text_message.place(x=10, y=87)
 

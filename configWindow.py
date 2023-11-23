@@ -4,7 +4,7 @@ import tkinter.messagebox
 import psycopg2
 # import base64
 
-db_config = "dbname=automatizador user=postgres password=senha host=127.0.0.1"
+db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
 
 
 class ConfigWindow:

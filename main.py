@@ -6,7 +6,7 @@ import tkinter as tk
 # import os
 import psycopg2
 
-db_config = "dbname=automatizador user=postgres password=senha host=127.0.0.1"
+db_config = "dbname=automatizador user=postgres password=mpti3562 host=127.0.0.1"
 
 
 def open_mainWindow():
