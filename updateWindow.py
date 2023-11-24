@@ -4,9 +4,6 @@ import requests
 import json
 
 
-# import subprocess
-
-
 class UpdateSoftware:
     def __init__(self):
         # Create a update window

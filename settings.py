@@ -12,8 +12,6 @@ DB_USER = os.environ.get('DB_USER', default='')
 DB_PASSWORD = os.environ.get("DB_PASSWORD", default='')
 DB_HOST = os.environ.get("DB_HOST", default='localhost')
 
-print(f"Nome: {DB_NAME}\nUsuário: {DB_USER}\nSenha: {DB_PASSWORD}\nHost: {DB_HOST}\n")
-
 
 def getDatabaseUrl():
     return f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
