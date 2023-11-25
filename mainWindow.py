@@ -38,6 +38,7 @@ def open_managerWindow():
 
 class MainWindow:
     def __init__(self, open_registerWindow):
+        # Caminho do arquivo recent_files.json
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         self.recent_file_path = os.path.join(self.script_dir, 'recent_files.json')
 
@@ -92,15 +93,30 @@ class MainWindow:
 
         self.window.config(menu=self.menuBar)
 
-        self.text_widget = tk.Text(self.window, wrap=tk.WORD, width=160, height=30)
-        self.text_widget.pack()
+        # Frame do textWidget
+        self.tframe = tk.Frame(self.window)
+        self.tframe.pack(side=tk.TOP, padx=10, pady=10)
 
-        self.btn_send = tk.Button(self.window, text='ENVIAR EMAIL', command=self.sendEmails, state=tk.DISABLED)
-        self.btn_send.place(x=40, y=500)
-        self.sendLabel = tk.Label(self.window, text='')
-        self.sendLabel.place(x=135, y=500)
-        self.contacts = tk.Button(self.window, text='Selecionar arquivo de contatos', command=self.open_contactFile)
-        self.contacts.place(x=40, y=535)
+        # Frame dos botões
+        self.btn_frame = tk.Frame(self.window)
+        self.btn_frame.pack(side=tk.LEFT, padx=10, pady=10)
+
+        # textWidget para mostrar e editar conteúdo do arquivo html
+        self.text_widget = tk.Text(self.tframe, wrap=tk.WORD, width=160, height=30)
+        self.text_widget.grid(row=0, column=0, columnspan=2)
+
+        # botão para enviar emails
+        self.btn_send = tk.Button(self.btn_frame, text='ENVIAR EMAIL', command=self.sendEmails, state=tk.DISABLED)
+        self.btn_send.grid(row=1, column=0, pady=10, sticky='w')
+
+        # botão para selecionar arquivo CSV
+        self.contacts = tk.Button(self.btn_frame, text='Selecionar arquivo de contatos', command=self.open_contactFile)
+        self.contacts.grid(row=2, column=0, pady=10, sticky='w')
+
+        # texto para mostrar arquivo CSV selecionado
+        self.sendLabel = tk.Label(self.btn_frame, text='')
+        self.sendLabel.grid(row=2, column=1, pady=10, sticky='w')
+
         self.contacts_file_path = None
 
         self.center_window(1024, 760)
@@ -109,25 +125,30 @@ class MainWindow:
         self.update_recent_submenu()
 
     def open_contactFile(self):
-        contacts_dir = 'Contacts'
-        contact_path = filedialog.askopenfilename(initialdir=contacts_dir)
-        if contact_path:
-            self.contacts = self.load_contacts(contact_path)
-            self.sendLabel.config(text=f'enviando para {contact_path}')
-            self.btn_send.config(state=tk.NORMAL)
+        try:
+            contacts_dir = 'Contacts'
+            contact_path = filedialog.askopenfilename(initialdir=contacts_dir)
+            if contact_path:
+                self.contacts = self.load_contacts(contact_path)
+                self.sendLabel.config(text=f'enviando para {contact_path}')
+                self.btn_send.config(state=tk.NORMAL)
+        except Exception as e:
+            print(f"Erro ao abrir arquivo de contatos: {e}")
 
     @staticmethod
     def load_contacts(contact_path):
         names = []
         emails = []
-
-        with open(contact_path, 'r') as file:
-            reader = csv.reader(file, delimiter=';')
-            for row in reader:
-                if len(row) >= 2:
-                    names.append(row[0])
-                    emails.append(row[1])
-        return names, emails
+        try:
+            with open(contact_path, 'r') as file:
+                reader = csv.reader(file, delimiter=';')
+                for row in reader:
+                    if len(row) >= 2:
+                        names.append(row[0])
+                        emails.append(row[1])
+            return names, emails
+        except Exception as e:
+            print(f"Erro ao carregar lista de contatos: {e}")
 
     def read_smtpConfig(self):
         conn = None
@@ -175,7 +196,7 @@ class MainWindow:
                             server = smtplib.SMTP(self.smtpServer, self.smtpPort)
                             server.set_debuglevel(1)
                             server.ehlo()
-                            # server.starttls()
+                            server.starttls()
                             server.login(self.smtpEmail, self.smtpPassword)
 
                             # Send email for recipients
@@ -198,7 +219,7 @@ class MainWindow:
     # Open files
     def open_file(self):
         file_dir = 'Messages'
-        file_path = filedialog.askopenfilename(initialdir=file_dir)
+        file_path = filedialog.askopenfilename(initialdir=file_dir, defaultextension='.html', filetypes=[("Arquivo html", "*.html")])
         if file_path:
             self.add_to_recent(file_path)
             self.current_file = file_path

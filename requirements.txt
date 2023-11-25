@@ -1,0 +1,4 @@
+passlib==1.7.4
+requests~=2.25.1
+Kivy~=2.2.1
+python-dotenv~=1.0.0

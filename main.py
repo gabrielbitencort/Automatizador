@@ -11,14 +11,20 @@ db_config = getDatabaseUrl()
 
 
 def open_mainWindow():
-    loginWindow.window.destroy()
-    mainWindow = MainWindow(lambda: open_registerWindow(loginWindow))
-    mainWindow.window.mainloop()
+    try:
+        loginWindow.window.destroy()
+        mainWindow = MainWindow(lambda: open_registerWindow(loginWindow))
+        mainWindow.window.mainloop()
+    except Exception as e:
+        print(f"Erro ao abrir mainWindow: {e}")
 
 
 def open_registerWindow(login_window):
-    registerWindow = RegisterWindow(lambda: userRegister(registerWindow))
-    registerWindow.window.mainloop()
+    try:
+        registerWindow = RegisterWindow(lambda: userRegister(registerWindow))
+        registerWindow.window.mainloop()
+    except Exception as e:
+        print(f"Erro ao abrir registerWindow: {e}")
 
 
 def clear_input_fields(input_fields):
