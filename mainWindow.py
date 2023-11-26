@@ -1,13 +1,15 @@
 import os
-# import platform
+import platform
 import csv
 import json
 import smtplib
 import threading
-# import logging
+import logging
 import tkinter as tk
 from builtins import FileNotFoundError
 from tkinter import filedialog
+from tkhtmlview import HTMLLabel
+from tkcalendar import DateEntry
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -18,6 +20,7 @@ from updateWindow import UpdateSoftware
 from managerWindow import ManagerWindow
 
 from settings import getDatabaseUrl
+
 db_config = getDatabaseUrl()
 
 
@@ -32,8 +35,8 @@ def open_updateWindow():
 
 
 def open_managerWindow():
-    managerwindow = ManagerWindow()
-    managerwindow.window.mainloop()
+    managerWindow = ManagerWindow()
+    managerWindow.window.mainloop()
 
 
 class MainWindow:
@@ -49,7 +52,7 @@ class MainWindow:
 
         self.window.protocol("WM_DELETE_WINDOW", self.save_recent_files_on_exit)
 
-        #   Maximize window if sytem is windows
+        #   Maximize window if system is windows
         # if platform.system() == "Windows":
         #     self.window.state("zoomed")
         # else:
@@ -101,13 +104,31 @@ class MainWindow:
         self.btn_frame = tk.Frame(self.window)
         self.btn_frame.pack(side=tk.LEFT, padx=10, pady=10)
 
+        # Frame do botão view_file
+        self.view_frame = tk.Frame(self.window)
+        self.view_frame.pack(side=tk.RIGHT, padx=10, pady=10)
+
         # textWidget para mostrar e editar conteúdo do arquivo html
         self.text_widget = tk.Text(self.tframe, wrap=tk.WORD, width=160, height=30)
         self.text_widget.grid(row=0, column=0, columnspan=2)
 
+        # botão para visualizar email
+        self.btn_view = tk.Button(self.view_frame, text="VISUALIZAR E-MAIL", command=self.view_file)
+        self.btn_view.grid(row=1, column=0, pady=10, sticky='e')
+
         # botão para enviar emails
         self.btn_send = tk.Button(self.btn_frame, text='ENVIAR EMAIL', command=self.sendEmails, state=tk.DISABLED)
         self.btn_send.grid(row=1, column=0, pady=10, sticky='w')
+
+        # checkbox para programar horário
+        self.var_checkbox = tk.IntVar()
+        self.checkbox = tk.Checkbutton(self.btn_frame, text="Programar horário", variable=self.var_checkbox,
+                                       command=self.verify_checkbox)
+        self.checkbox.grid(row=1, column=1, pady=10, padx=10, sticky='w')
+
+        # entrada para selecionar data de envio
+        self.cal = DateEntry(self.btn_frame, width=16, background='gray', foreground='white', bd=2)
+        self.cal.grid_remove()
 
         # botão para selecionar arquivo CSV
         self.contacts = tk.Button(self.btn_frame, text='Selecionar arquivo de contatos', command=self.open_contactFile)
@@ -124,13 +145,22 @@ class MainWindow:
         self.recent_files = self.load_recent_files(self.recent_file_path)
         self.update_recent_submenu()
 
+    def verify_checkbox(self):
+        if self.var_checkbox.get() == 1:
+            print("A checkbox está marcada.")
+            self.cal.grid(row=1, column=2, pady=10, padx=10, sticky='w')
+        else:
+            print("A checkbox está desmarcada.")
+            self.cal.grid_remove()
+
     def open_contactFile(self):
         try:
             contacts_dir = 'Contacts'
             contact_path = filedialog.askopenfilename(initialdir=contacts_dir)
             if contact_path:
+                file_name = os.path.basename(contact_path)
                 self.contacts = self.load_contacts(contact_path)
-                self.sendLabel.config(text=f'enviando para {contact_path}')
+                self.sendLabel.config(text=f'enviando para {file_name}')
                 self.btn_send.config(state=tk.NORMAL)
         except Exception as e:
             print(f"Erro ao abrir arquivo de contatos: {e}")
@@ -191,7 +221,7 @@ class MainWindow:
                             with open(self.current_file, 'r', encoding='utf-8') as html_file:
                                 email_body = MIMEText(html_file.read().replace("=", "@"), 'html', 'utf-8')
                             msg.attach(email_body)
-                            # logging.basicConfig(level=logging.DEBUG)
+                            logging.basicConfig(level=logging.DEBUG)
                             # Initialize SMTP connection
                             server = smtplib.SMTP(self.smtpServer, self.smtpPort)
                             server.set_debuglevel(1)
@@ -219,7 +249,8 @@ class MainWindow:
     # Open files
     def open_file(self):
         file_dir = 'Messages'
-        file_path = filedialog.askopenfilename(initialdir=file_dir, defaultextension='.html', filetypes=[("Arquivo html", "*.html")])
+        file_path = filedialog.askopenfilename(initialdir=file_dir, defaultextension='.html',
+                                               filetypes=[("Arquivo html", "*.html")])
         if file_path:
             self.add_to_recent(file_path)
             self.current_file = file_path
@@ -297,6 +328,20 @@ class MainWindow:
     def close_file(self):
         self.current_file = None
         self.text_widget.delete(1.0, tk.END)
+
+    def view_file(self):
+        if not hasattr(self, 'view_window') or not self.view_window.winfo_exists():
+            self.view_window = tk.Toplevel(self.window)
+            self.view_window.title("VISUALIZAR E-MAIL")
+            self.view_label = HTMLLabel(self.view_window)
+            self.view_label.pack(expand=True, fill='both')
+
+            if self.current_file:
+                with open(self.current_file, 'r', encoding='utf-8') as file:
+                    content = file.read()
+                    self.view_label.set_html(content)
+        else:
+            self.view_window.lift()
 
     # Centralize the window
     def center_window(self, width, height):

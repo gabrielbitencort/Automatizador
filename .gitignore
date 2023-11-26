@@ -1,3 +1,8 @@
 /settings.env
 .idea/
 venv/
+/recent_files.json
+/contacts.csv
+/test2.py
+/tests.py
+/timepicker.py
