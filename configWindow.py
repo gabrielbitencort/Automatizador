@@ -83,7 +83,8 @@ class ConfigWindow:
             conn = psycopg2.connect(db_config)
             cursor = conn.cursor()
             cursor.execute('''CREATE TABLE IF NOT EXISTS smtp (
-                                    id SERIAL PRIMARY KEY,
+                                    id SERIAL PRIMARY KEY,                                 
+                                    user_id UUID REFERENCES users(user_id),
                                     server TEXT, 
                                     port TEXT,
                                     email TEXT, 
@@ -98,46 +99,52 @@ class ConfigWindow:
                 conn.close()
 
     def save_settings(self):
-        self.create_smtp_table()
-        smtpServer = self.serverInput.get()
-        smtpPort = self.portInput.get()
-        smtpEmail = self.emailInput.get()
-        smtpPassword = self.passwdInput.get()
 
-        if smtpServer and smtpPort and smtpEmail and smtpPassword:
-            # converte o email para minusculas para comparação
-            smtpEmailLower = smtpEmail.lower()
+        user_id = "5d7f7cc7-f429-46a8-bdf9-389fbbad201a"
 
-            # usando o bloco "with" para lidar com a conexão automaticamente
-            with psycopg2.connect(db_config) as conn:
-                try:
-                    cursor = conn.cursor()
+        if user_id:
+            self.create_smtp_table()
+            smtpServer = self.serverInput.get()
+            smtpPort = self.portInput.get()
+            smtpEmail = self.emailInput.get()
+            smtpPassword = self.passwdInput.get()
 
-                    # verifica se já existe uma entrada com o mesmo servidor de e-mail
-                    query_check = 'SELECT id FROM smtp WHERE LOWER(server) = LOWER(%s) OR LOWER(email) = %s'
-                    data_check = (smtpServer, smtpEmailLower)
-                    cursor.execute(query_check, data_check)
-                    existing_id = cursor.fetchone()
+            if smtpServer and smtpPort and smtpEmail and smtpPassword:
+                # converte o email para minusculas para comparação
+                smtpEmailLower = smtpEmail.lower()
 
-                    print(f"Existing ID: {existing_id}")
+                # usando o bloco "with" para lidar com a conexão automaticamente
+                with psycopg2.connect(db_config) as conn:
+                    try:
+                        cursor = conn.cursor()
 
-                    if existing_id:
-                        # Se já existir, atualiza dados
-                        print("Updating existing entry.")
-                        query_update = "UPDATE smtp SET server = %s, port = %s, email = %s, password = %s WHERE id = %s"
-                        data_update = (smtpServer, smtpPort, smtpEmail, smtpPassword, existing_id[0])
-                        cursor.execute(query_update, data_update)
-                    else:
-                        # Se não existir, criar nova entrada
-                        print("Creating new entry.")
-                        query_insert = "INSERT INTO smtp (server, port, email, password) VALUES (%s, %s, %s, %s)"
-                        data_insert = (smtpServer, smtpPort, smtpEmail, smtpPassword)
-                        cursor.execute(query_insert, data_insert)
+                        # verifica se já existe uma entrada com o mesmo servidor de e-mail
+                        query_check = 'SELECT id FROM smtp WHERE user_id = %s AND LOWER(server) = LOWER(%s) OR LOWER(email) = %s'
+                        data_check = (user_id, smtpServer, smtpEmailLower)
+                        cursor.execute(query_check, data_check)
+                        existing_id = cursor.fetchone()
 
-                    conn.commit()
-                    print("Dados SMTP inseridos ou atualizados com sucesso.")
-                    tk.messagebox.showinfo("Sucesso", "Informações atualizadas com sucesso.", parent=self.window)
-                except psycopg2.Error as e:
-                    print("Erro ao inserir ou atualizar dados SMTP na tabela: ", e)
+                        print(f"Existing ID: {existing_id}")
+
+                        if existing_id:
+                            # Se já existir, atualiza dados
+                            print("Updating existing entry.")
+                            query_update = "UPDATE smtp SET server = %s, port = %s, email = %s, password = %s WHERE id = %s"
+                            data_update = (smtpServer, smtpPort, smtpEmail, smtpPassword, existing_id[0])
+                            cursor.execute(query_update, data_update)
+                        else:
+                            # Se não existir, criar nova entrada
+                            print("Creating new entry.")
+                            query_insert = "INSERT INTO smtp (user_id, server, port, email, password) VALUES (%s, %s, %s, %s, %s)"
+                            data_insert = (user_id, smtpServer, smtpPort, smtpEmail, smtpPassword)
+                            cursor.execute(query_insert, data_insert)
+
+                        conn.commit()
+                        print("Dados SMTP inseridos ou atualizados com sucesso.")
+                        tk.messagebox.showinfo("Sucesso", "Informações atualizadas com sucesso.", parent=self.window)
+                    except psycopg2.Error as e:
+                        print("Erro ao inserir ou atualizar dados SMTP na tabela: ", e)
+            else:
+                self.configMessage3.config(text='Por favor, preencha todos os campos!')
         else:
-            self.configMessage3.config(text='Por favor, preencha todos os campos!')
+            print("Usuário não está logado. Faça o login primeiro.")

@@ -108,6 +108,10 @@ class MainWindow:
         self.view_frame = tk.Frame(self.window)
         self.view_frame.pack(side=tk.RIGHT, padx=10, pady=10)
 
+        # Frame informações usuário
+        self.userFrame = tk.Frame(self.window, background='blue')
+        self.userFrame.pack(side=tk.BOTTOM)
+
         # textWidget para mostrar e editar conteúdo do arquivo html
         self.text_widget = tk.Text(self.tframe, wrap=tk.WORD, width=160, height=30)
         self.text_widget.grid(row=0, column=0, columnspan=2)
@@ -248,16 +252,19 @@ class MainWindow:
 
     # Open files
     def open_file(self):
-        file_dir = 'Messages'
-        file_path = filedialog.askopenfilename(initialdir=file_dir, defaultextension='.html',
-                                               filetypes=[("Arquivo html", "*.html")])
-        if file_path:
-            self.add_to_recent(file_path)
-            self.current_file = file_path
-            self.add_to_recent(file_path)
-            self.update_recent_submenu()
-            self.load_file_content(file_path)
-            self.save_recent_file()
+        try:
+            file_dir = 'Messages'
+            file_path = filedialog.askopenfilename(initialdir=file_dir, defaultextension='.html',
+                                                   filetypes=[("Arquivo html", "*.html")])
+            if file_path:
+                self.add_to_recent(file_path)
+                self.current_file = file_path
+                self.add_to_recent(file_path)
+                self.update_recent_submenu()
+                self.load_file_content(file_path)
+                self.save_recent_file()
+        except Exception as e:
+            print(f"Não foi possivel abrir o arquivo: {e}")
 
     def save_recent_file(self):
         try:

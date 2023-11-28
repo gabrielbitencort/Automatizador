@@ -4,7 +4,10 @@ import psycopg2
 from passlib.hash import pbkdf2_sha256
 
 from settings import getDatabaseUrl
+from userSession import UserSession
 db_config = getDatabaseUrl()
+
+user_id = UserSession().get_logged_in_user_id()
 
 def check_duplicate_user(name, email):
     db_manager = DatabaseManager()
@@ -88,7 +91,7 @@ class ManagerWindow:
         try:
             self.db_manager.connect()
             self.users_listbox.delete(0, tk.END)
-            cursor = self.db_manager.execute_query("SELECT id, name, email FROM users")
+            cursor = self.db_manager.execute_query("SELECT user_id, name, email FROM users")
             if cursor:
                 users = cursor.fetchall()
                 for user in users:
@@ -130,7 +133,7 @@ class ManagerWindow:
             print(f"Excluindo o usuário: {selected_user}")
             user_id = int(selected_user.split(" - ")[0])
             self.db_manager.connect()
-            query = "DELETE FROM users WHERE id = %s"
+            query = "DELETE FROM users WHERE user_id = %s"
             data = (user_id,)
             cursor = self.db_manager.execute_query(query, data)
 
@@ -199,7 +202,7 @@ class EditUser:
                     query = '''UPDATE users SET name = %s, 
                                                 email = %s,
                                                 password_hash = %s 
-                                                WHERE id = %s'''
+                                                WHERE user_id = %s'''
                     data = (name, email, password_hash, self.user_id)
                     cursor = self.db_manager.execute_query(query, data)
                     if cursor:
