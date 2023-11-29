@@ -3,7 +3,5 @@
 venv/
 /recent_files.json
 /contacts.csv
-/test2.py
-/test3.py
 /tests.py
 /timepicker.py

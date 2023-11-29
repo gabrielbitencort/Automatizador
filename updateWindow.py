@@ -25,7 +25,7 @@ class UpdateSoftware:
         # Verify updates
         latest_version = self.check_for_updates()
         if latest_version:
-            current_version = 'v1.2.0-beta'
+            current_version = 'v1.3.0-beta'
             if latest_version == current_version:
                 tk.messagebox.showinfo("Atualização Disponivel", "Você já possui a versão mais recente.", parent=self.window)
             else:
