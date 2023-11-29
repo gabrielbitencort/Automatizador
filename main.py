@@ -1,18 +1,22 @@
 from loginWindow import LoginWindow
 from mainWindow import MainWindow
 from registerWindow import RegisterWindow
-from userSession import UserSession
+from userSession import userSession
 from passlib.hash import pbkdf2_sha256
 import tkinter as tk
 # import os
 import psycopg2
 import uuid
 
-userSession = UserSession()
-
 from settings import getDatabaseUrl
 db_config = getDatabaseUrl()
 
+
+def get_logged_in_user_id():
+    return userSession.get_logged_in_user_id()
+
+def set_logged_in_user_id(current_user_id):
+    return userSession.set_logged_in_user_id(current_user_id)
 
 def open_mainWindow():
     try:
@@ -76,10 +80,10 @@ def login(event=None):
                 conn.close()
 
                 if verify_password(stored_password_hash, password):
-                    loginWindow.text_message.config(text='Login realizado com sucesso.')
+                    set_logged_in_user_id(user_id)
                     print("Login realizado com sucesso.")
-                    userSession.set_logged_in_user_id(user_id)
                     print(f"ID de usuário: {user_id}")
+
                     loginWindow.window.after(2000, open_mainWindow())
                 else:
                     loginWindow.text_message.config(text='Dados de login incorretos.')
@@ -93,9 +97,6 @@ def login(event=None):
     else:
         loginWindow.text_message.config(text='Nome de usuário ou senha errado.')
         print("Nome de usuário ou senha errado")
-
-def get_logged_in_user_id():
-    return userSession.get_logged_in_user_id()
 
 
 def create_users_table():
@@ -191,5 +192,4 @@ def userRegister(registerWindow):
 
 if __name__ == '__main__':
     loginWindow = LoginWindow(login)
-    # open_mainWindow()
     loginWindow.window.mainloop()

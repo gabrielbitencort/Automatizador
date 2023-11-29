@@ -1,5 +1,5 @@
 import os
-import platform
+# import platform
 import csv
 import json
 import smtplib
@@ -19,28 +19,38 @@ from configWindow import ConfigWindow
 from updateWindow import UpdateSoftware
 from managerWindow import ManagerWindow
 
+from userSession import userSession
 from settings import getDatabaseUrl
 
 db_config = getDatabaseUrl()
 
 
+def get_logged_in_user_id():
+    return userSession.get_logged_in_user_id()
+
 def open_configWindow():
     configWindow = ConfigWindow()
     configWindow.window.mainloop()
 
-
 def open_updateWindow():
     updateWindow = UpdateSoftware()
     updateWindow.window.mainloop()
-
 
 def open_managerWindow():
     managerWindow = ManagerWindow()
     managerWindow.window.mainloop()
 
 
+def show_current_id():
+    user_id = get_logged_in_user_id()
+    print(f"ID do usuário atual: {user_id}")
+
+
 class MainWindow:
     def __init__(self, open_registerWindow):
+        # User_ID do usuário logado
+        self.current_user_id = get_logged_in_user_id()
+
         # Caminho do arquivo recent_files.json
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         self.recent_file_path = os.path.join(self.script_dir, 'recent_files.json')
@@ -148,6 +158,7 @@ class MainWindow:
 
         self.recent_files = self.load_recent_files(self.recent_file_path)
         self.update_recent_submenu()
+        show_current_id()
 
     def verify_checkbox(self):
         if self.var_checkbox.get() == 1:
@@ -189,8 +200,9 @@ class MainWindow:
         try:
             conn = psycopg2.connect(db_config)
             cursor = conn.cursor()
-            query = 'SELECT server, port, email, password FROM smtp'
-            cursor.execute(query)
+            query = 'SELECT server, port, email, password FROM smtp WHERE user_id = %s'
+            data = (self.current_user_id,)
+            cursor.execute(query, data)
             smtp_data = cursor.fetchone()
 
             if smtp_data:
@@ -214,6 +226,7 @@ class MainWindow:
                 def send_email_func():
                     try:
                         print("Enviando email com arquivo: ", self.current_file)
+                        print(f"Enviando email com o user_id {self.current_user_id}")
                         for email in emails:
                             # Create MIMEMultipart object for email
                             msg = MIMEMultipart("alternative")

@@ -7,3 +7,6 @@ class UserSession:
 
     def get_logged_in_user_id(self):
         return self.logged_in_user_id
+
+
+userSession = UserSession()

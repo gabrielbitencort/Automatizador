@@ -1,14 +1,20 @@
+import psycopg2
 import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox
-import psycopg2
 
+from userSession import userSession
 from settings import getDatabaseUrl
 db_config = getDatabaseUrl()
 
+def get_logged_in_user_id():
+    return userSession.get_logged_in_user_id()
 
 class ConfigWindow:
     def __init__(self):
+        # User_ID do usuário logado
+        self.current_user_id = get_logged_in_user_id()
+
         # Create a window with title
         self.window = tk.Tk()
         self.window.geometry('600x300')
@@ -82,8 +88,7 @@ class ConfigWindow:
         try:
             conn = psycopg2.connect(db_config)
             cursor = conn.cursor()
-            cursor.execute('''CREATE TABLE IF NOT EXISTS smtp (
-                                    id SERIAL PRIMARY KEY,                                 
+            cursor.execute('''CREATE TABLE IF NOT EXISTS smtp (                                                                     
                                     user_id UUID REFERENCES users(user_id),
                                     server TEXT, 
                                     port TEXT,
@@ -99,10 +104,7 @@ class ConfigWindow:
                 conn.close()
 
     def save_settings(self):
-
-        user_id = "5d7f7cc7-f429-46a8-bdf9-389fbbad201a"
-
-        if user_id:
+        if self.current_user_id:
             self.create_smtp_table()
             smtpServer = self.serverInput.get()
             smtpPort = self.portInput.get()
@@ -119,24 +121,24 @@ class ConfigWindow:
                         cursor = conn.cursor()
 
                         # verifica se já existe uma entrada com o mesmo servidor de e-mail
-                        query_check = 'SELECT id FROM smtp WHERE user_id = %s AND LOWER(server) = LOWER(%s) OR LOWER(email) = %s'
-                        data_check = (user_id, smtpServer, smtpEmailLower)
+                        query_check = 'SELECT user_id FROM smtp WHERE user_id = %s'
+                        data_check = (self.current_user_id,)
                         cursor.execute(query_check, data_check)
-                        existing_id = cursor.fetchone()
+                        existing_user_id = cursor.fetchone()
 
-                        print(f"Existing ID: {existing_id}")
+                        print(f"Existing ID: {existing_user_id}")
 
-                        if existing_id:
-                            # Se já existir, atualiza dados
-                            print("Updating existing entry.")
-                            query_update = "UPDATE smtp SET server = %s, port = %s, email = %s, password = %s WHERE id = %s"
-                            data_update = (smtpServer, smtpPort, smtpEmail, smtpPassword, existing_id[0])
+                        if existing_user_id:
+                            # Atualiza as configurações existentes
+                            print("Atualizando entrada existente.")
+                            query_update = "UPDATE smtp SET server = %s, port = %s, email = %s, password = %s WHERE user_id = %s"
+                            data_update = (smtpServer, smtpPort, smtpEmail, smtpPassword, self.current_user_id)
                             cursor.execute(query_update, data_update)
                         else:
-                            # Se não existir, criar nova entrada
-                            print("Creating new entry.")
+                            # Se não existir, cria nova entrada
+                            print("Criando nova entrada.")
                             query_insert = "INSERT INTO smtp (user_id, server, port, email, password) VALUES (%s, %s, %s, %s, %s)"
-                            data_insert = (user_id, smtpServer, smtpPort, smtpEmail, smtpPassword)
+                            data_insert = (self.current_user_id, smtpServer, smtpPort, smtpEmail, smtpPassword)
                             cursor.execute(query_insert, data_insert)
 
                         conn.commit()
