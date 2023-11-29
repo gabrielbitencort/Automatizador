@@ -95,8 +95,8 @@ def login(event=None):
         except psycopg2.Error as error:
             print("Erro ao consultar o banco de dados: ", error)
     else:
-        loginWindow.text_message.config(text='Nome de usuário ou senha errado.')
-        print("Nome de usuário ou senha errado")
+        loginWindow.text_message.config(text='Por favor, preencha todos os campos.')
+        print("Por favor, preencha todos os campos.")
 
 
 def create_users_table():
