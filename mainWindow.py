@@ -6,7 +6,6 @@ import smtplib
 import datetime
 import threading
 import tkinter as tk
-from threading import Timer
 from tkinter import filedialog
 from tkhtmlview import HTMLLabel
 from tkcalendar import DateEntry
@@ -52,6 +51,8 @@ class MainWindow:
     def __init__(self, open_registerWindow):
         # User_ID do usuário logado
         self.current_user_id = get_logged_in_user_id()
+
+        self.timer_id = None
 
         # Caminho do arquivo recent_files.json
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -150,7 +151,6 @@ class MainWindow:
         self.time = TimePicker(self.btn_frame)
         self.time.get_time(row=1, column=3, padx=10, pady=10, sticky='w')
         self.time.hide_time_picker()
-        self.timer_id = None
 
         # botão para selecionar arquivo CSV
         self.contacts = tk.Button(self.btn_frame, text='Selecionar arquivo de contatos', command=self.open_contactFile)
@@ -169,54 +169,70 @@ class MainWindow:
         show_current_id()
 
     def handle_sendEmails(self):
-        # Verifica se a checkbox está marcada
-        if self.var_checkbox.get() == 1:
-            # Verifica se a thread do temporizador está ativa
-            if not self.timer_id or not self.timer_id.is_alive():
-                # Chama a função sendEmails imediatamente se a checkbox estivar ativa
-                print("Enviando email temporizado.")
+        try:
+            # Verifica se a checkbox está marcada
+            if self.var_checkbox.get() == 1:
+                # Verifica se a thread do temporizador está ativa
+                if not self.timer_id or not self.timer_id.is_alive():
+                    # Chama a função sendEmails imediatamente se a checkbox estivar ativa
+                    print("Enviando email temporizado.")
+                    self.start_timer()
+            else:
+                print("A checkbox não está marcada, enviando email imediatamente.")
                 self.sendEmails()
-        else:
-            print("A checkbox não está marcada.")
+                self.cancel_timer()
+        except Exception as e:
+            print(f"Erro: {e}")
 
     def verify_checkbox(self):
         if self.var_checkbox.get() == 1:
             print("A checkbox está marcada.")
             self.cal.grid(row=1, column=2, pady=10, padx=10, sticky='w')
             self.time.show_time_picker()
-            # Inicia o temporizador quando a checkbox é marcada
-            self.start_timer()
         else:
             print("A checkbox está desmarcada.")
             self.cal.grid_remove()
             self.time.hide_time_picker()
-            # Cancela o temporizador quando a checkbox é desmarcada
-            self.cancel_timer()
 
     def start_timer(self):
-        # Obtém a data e hora programada
-        scheduled_date = self.cal.get_date()
-        scheduled_time = self.time.get_selected_time()
+        try:
+            # Cancela o temporizador se estiver ativo
+            self.cancel_timer()
 
-        # Combina a data e a hora
-        scheduled_datetime = datetime.datetime.combine(scheduled_date, datetime.time(hour=scheduled_time[0], minute=scheduled_time[1]))
+            # Obtém a data e hora programada
+            scheduled_date = self.cal.get_date()
+            scheduled_time = self.time.get_selected_time()
 
-        # Calcula o tempo restante até a data e hora programada em segundos
-        current_time = datetime.datetime.now()
-        time_difference = (scheduled_datetime - current_time).total_seconds()
+            # Combina a data e a hora
+            scheduled_datetime = datetime.datetime.combine(scheduled_date, datetime.time(hour=scheduled_time[0], minute=scheduled_time[1]))
 
-        # Inicia o temporizador em uma nova thread
-        self.timer_id = Timer(time_difference, self.sendEmails_on_timer)
-        self.timer_id.start()
+            # Calcula o tempo restante até a data e hora programada em segundos
+            current_time = datetime.datetime.now()
+            time_difference = (scheduled_datetime - current_time).total_seconds()
+
+            # Inicia o temporizador apenas se o tempo restante for positivo
+            if time_difference > 0:
+                self.timer_id = self.window.after(int(time_difference * 1000), self.sendEmails_on_timer)
+            print(f"")
+
+        except threading.ThreadError as e:
+            print(f"Erro de threading: {e}")
+        except Exception as e:
+            print(f"Erro: {e}")
 
     def sendEmails_on_timer(self):
         print("Enviando email temporizado")
-        self.window.after(0, self.sendEmails())
+        self.sendEmails()
+
+        # Decide se deve iniciar o temporizador novamente
+        if self.var_checkbox.get() == 1 and self.timer_id is not None:
+            self.start_timer()
 
     def cancel_timer(self):
         # Cancela o temporizador se estiver ativo
-        if self.timer_id and self.timer_id.is_alive():
-            self.timer_id.cancel()
+        if self.timer_id:
+            self.window.after_cancel(self.timer_id)
+            self.timer_id = None
 
     def open_contactFile(self):
         try:
