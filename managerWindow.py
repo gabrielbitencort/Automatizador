@@ -107,7 +107,7 @@ class ManagerWindow:
             if not selected_user:
                 tk.messagebox.showerror("Erro", "Selecione um usuário para editar.", parent=self.window)
                 return
-            user_id = int(selected_user.split(" - ")[0])
+            user_id = selected_user.split(" - ")[0]
             edit = EditUser(user_id)
             edit.window.mainloop()
         except Exception as e:
@@ -131,7 +131,7 @@ class ManagerWindow:
         confirmed = tk.messagebox.askyesno("Confirmação", f"Tem certeza que deseja excluir o usuário: {selected_user}?", parent=self.window)
         if confirmed:
             print(f"Excluindo o usuário: {selected_user}")
-            user_id = int(selected_user.split(" - ")[0])
+            user_id = selected_user.split(" - ")[0]
             self.db_manager.connect()
             query = "DELETE FROM users WHERE user_id = %s"
             data = (user_id,)

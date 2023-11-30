@@ -3,3 +3,6 @@ requests~=2.31.0
 python-dotenv~=1.0.0
 tkcalendar~=1.6.1
 tkhtmlview~=0.2.0
+psycopg2~=2.9.9
+uuid~=1.30
+tkTimePicker~=2.0.2

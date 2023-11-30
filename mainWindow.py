@@ -19,6 +19,7 @@ from configWindow import ConfigWindow
 from updateWindow import UpdateSoftware
 from managerWindow import ManagerWindow
 
+from timePicker import TimePicker
 from userSession import userSession
 from settings import getDatabaseUrl
 
@@ -144,6 +145,11 @@ class MainWindow:
         self.cal = DateEntry(self.btn_frame, width=16, background='gray', foreground='white', bd=2)
         self.cal.grid_remove()
 
+        # entrada para selecionar horário de envio
+        self.time = TimePicker(self.btn_frame)
+        self.time.get_time(row=1, column=3, padx=10, pady=10, sticky='w')
+        self.time.hide_time_picker()
+
         # botão para selecionar arquivo CSV
         self.contacts = tk.Button(self.btn_frame, text='Selecionar arquivo de contatos', command=self.open_contactFile)
         self.contacts.grid(row=2, column=0, pady=10, sticky='w')
@@ -164,9 +170,11 @@ class MainWindow:
         if self.var_checkbox.get() == 1:
             print("A checkbox está marcada.")
             self.cal.grid(row=1, column=2, pady=10, padx=10, sticky='w')
+            self.time.show_time_picker()
         else:
             print("A checkbox está desmarcada.")
             self.cal.grid_remove()
+            self.time.hide_time_picker()
 
     def open_contactFile(self):
         try:
