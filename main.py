@@ -1,15 +1,39 @@
+import sys
+
 from loginWindow import LoginWindow
 from mainWindow import MainWindow
 from registerWindow import RegisterWindow
 from userSession import userSession
 from passlib.hash import pbkdf2_sha256
 import tkinter as tk
-# import os
+import logging
 import psycopg2
 import uuid
+import os
 
 from settings import getDatabaseUrl
 db_config = getDatabaseUrl()
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+# Obtém o diretório do script
+scriptDir = os.path.dirname(os.path.abspath(sys.executable))
+
+# Define o diretório de logs como um subdiretório chamado 'logs'
+logFile = os.path.join(scriptDir, 'logs', f"{os.path.basename(sys.executable)}.log")
+
+# Cria o diretório se não existir
+os.makedirs(os.path.join(scriptDir, 'logs'), exist_ok=True)
+
+# Configuração do logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(logFile),
+        logging.StreamHandler()
+    ]
+)
 
 
 def get_logged_in_user_id():
@@ -24,6 +48,7 @@ def open_mainWindow():
         mainWindow = MainWindow(lambda: open_registerWindow(loginWindow))
         mainWindow.window.mainloop()
     except Exception as e:
+        logging.exception("Erro ao abrir mainWindow: %s", e)
         print(f"Erro ao abrir mainWindow: {e}")
 
 
@@ -32,6 +57,7 @@ def open_registerWindow(login_window):
         registerWindow = RegisterWindow(lambda: userRegister(registerWindow))
         registerWindow.window.mainloop()
     except Exception as e:
+        logging.exception("Erro ao abrir registerWindow: %s", e)
         print(f"Erro ao abrir registerWindow: {e}")
 
 
@@ -56,6 +82,7 @@ def login(event=None):
     password = loginWindow.input_passwd.get()
     if user_name and password:
         try:
+            logging.debug("Usuário e senha inseridos.")
             conn = psycopg2.connect(db_config)
             cursor = conn.cursor()
 
@@ -68,6 +95,8 @@ def login(event=None):
 
             if user_id_data:
                 user_id = user_id_data[0]
+
+                logging.debug("ID usuário logado: %s", user_id)
 
                 # Consulta para obter a senha hash
                 conn = psycopg2.connect(db_config)
@@ -84,6 +113,7 @@ def login(event=None):
                     print("Login realizado com sucesso.")
                     print(f"ID de usuário: {user_id}")
 
+                    logging.info("Login realizado com sucesso.")
                     loginWindow.window.after(2000, open_mainWindow())
                 else:
                     loginWindow.text_message.config(text='Dados de login incorretos.')
@@ -93,6 +123,7 @@ def login(event=None):
                 print("Nome de usuário não encontrado.")
 
         except psycopg2.Error as error:
+            logging.exception("Erro ao consultar o banco de dados: %s", error)
             print("Erro ao consultar o banco de dados: ", error)
     else:
         loginWindow.text_message.config(text='Por favor, preencha todos os campos.')
@@ -111,8 +142,10 @@ def create_users_table():
                                    password_hash TEXT
                                    )''')
         conn.commit()
+        logging.info("Tabela users criada ou já existe.")
         print("Tabela criada ou já existe.")
     except psycopg2.Error as error:
+        logging.exception("Erro ao criar a tabela users: %s", error)
         print("Erro ao criar a tabela users: ", error)
     finally:
         if conn is not None:
@@ -136,6 +169,7 @@ def check_duplicate_user(name, email):
         else:
             return False
     except psycopg2.Error as error:
+        logging.exception("Erro ao verificar duplicatas: %s", error)
         print("Erro ao verificar duplicatas: ", error)
         return True
     finally:
@@ -176,12 +210,14 @@ def userRegister(registerWindow):
                     conn.commit()
                     conn.close()
                     registerWindow.text_message.config(text="Usuário cadastrado com sucesso.")
-                    print("Usuário cadastrado")
+                    logging.info("Usuário cadastrado com sucesso.")
+                    print("Usuário cadastrado com sucesso.")
 
                     # Clear input fields
                     clear_input_fields(input_fields)
 
                 except psycopg2.Error as error:
+                    logging.exception("Erro ao inserir os dados: %s", error)
                     registerWindow.text_message.config(text="Erro ao inserir os dados!")
                     print("Erro ao inserir os dados: ", error)
         else:
@@ -191,5 +227,6 @@ def userRegister(registerWindow):
 
 
 if __name__ == '__main__':
+    logging.info("Script iniciado")
     loginWindow = LoginWindow(login)
     loginWindow.window.mainloop()

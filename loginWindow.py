@@ -2,7 +2,7 @@ import tkinter as tk
 
 
 class LoginWindow:
-    def __init__(self, call_main_window):
+    def __init__(self, login):
         # Create a window with title
         self.window = tk.Tk()
         self.window.geometry("220x120")
@@ -17,10 +17,10 @@ class LoginWindow:
         # Create password label and entry
         self.text_passwd = tk.Label(self.window, text='Senha: ')
         self.input_passwd = tk.Entry(self.window, show='*')
-        self.input_passwd.bind("<Return>", call_main_window)
+        self.input_passwd.bind("<Return>", login)
 
         # Create a login button
-        self.btn_login = tk.Button(self.window, text='ENTRAR', command=call_main_window, width=10)
+        self.btn_login = tk.Button(self.window, text='ENTRAR', command=login, width=10)
 
         # Create a messages label
         self.text_message = tk.Label(self.window, text='')
