@@ -132,10 +132,13 @@ class ManagerWindow:
         if confirmed:
             print(f"Excluindo o usuário: {selected_user}")
             user_id = selected_user.split(" - ")[0]
+
             self.db_manager.connect()
-            query = "DELETE FROM users WHERE user_id = %s"
+            query_user = "DELETE FROM users WHERE user_id = %s"
+            query_smtp = "DELETE FROM smtp WHERE user_id = %s"
             data = (user_id,)
-            cursor = self.db_manager.execute_query(query, data)
+            cursor = self.db_manager.execute_query(query_smtp, data)
+            cursor = self.db_manager.execute_query(query_user, data)
 
             if cursor:
                 tk.messagebox.showinfo("Sucesso", f"Usuário {user_id}, excluido com sucesso.", parent=self.window)
