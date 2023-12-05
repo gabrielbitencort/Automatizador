@@ -1,5 +1,6 @@
 import os
 import csv
+import sys
 import json
 import logging
 import smtplib
@@ -24,6 +25,13 @@ from userSession import userSession
 from settings import getDatabaseUrl
 
 db_config = getDatabaseUrl()
+
+# Caminho do arquivo recent_files.json
+if getattr(sys, 'frozen', False):
+    self.scriptDir = os.path.dirname(sys.executable)
+else:
+    self.scriptDir = os.path.dirname(__file__)
+recent_file_path = os.path.join(self.script_dir, 'recent_files.json')
 
 
 def get_logged_in_user_id():
@@ -53,10 +61,6 @@ class MainWindow:
         self.current_user_id = get_logged_in_user_id()
 
         self.timer_id = None
-
-        # Caminho do arquivo recent_files.json
-        self.script_dir = os.path.dirname(os.path.abspath(__file__))
-        self.recent_file_path = os.path.join(self.script_dir, 'recent_files.json')
 
         # Create a window with title
         self.window = tk.Tk()

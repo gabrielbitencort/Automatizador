@@ -1,5 +1,4 @@
 import sys
-
 from loginWindow import LoginWindow
 from mainWindow import MainWindow
 from registerWindow import RegisterWindow
@@ -14,10 +13,11 @@ import os
 from settings import getDatabaseUrl
 db_config = getDatabaseUrl()
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
 # Obtém o diretório do script
-scriptDir = os.path.dirname(os.path.abspath(sys.executable))
+if getattr(sys, 'frozen', False):
+    scriptDir = os.path.dirname(sys.executable)
+else:
+    scriptDir = os.path.dirname(__file__)
 
 # Define o diretório de logs como um subdiretório chamado 'logs'
 logFile = os.path.join(scriptDir, 'logs', f"{os.path.basename(sys.executable)}.log")

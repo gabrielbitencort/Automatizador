@@ -5,3 +5,4 @@ venv/
 /contacts.csv
 /tests.py
 /Icons
+/logs

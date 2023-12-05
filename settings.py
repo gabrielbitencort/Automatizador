@@ -1,6 +1,10 @@
+import sys
 import os
 
-scriptDir = os.path.dirname(os.path.abspath(__file__))
+if getattr(sys, 'frozen', False):
+    scriptDir = os.path.dirname(sys.executable)
+else:
+    scriptDir = os.path.dirname(__file__)
 envPath = os.path.join(scriptDir, 'settings.env')
 
 from dotenv import load_dotenv
