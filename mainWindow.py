@@ -13,7 +13,6 @@ from tkcalendar import DateEntry
 from email.mime.text import MIMEText
 from builtins import FileNotFoundError
 from email.mime.multipart import MIMEMultipart
-
 import psycopg2
 
 from configWindow import ConfigWindow
@@ -28,10 +27,10 @@ db_config = getDatabaseUrl()
 
 # Caminho do arquivo recent_files.json
 if getattr(sys, 'frozen', False):
-    self.scriptDir = os.path.dirname(sys.executable)
+    scriptDir = os.path.dirname(sys.executable)
 else:
-    self.scriptDir = os.path.dirname(__file__)
-recent_file_path = os.path.join(self.script_dir, 'recent_files.json')
+    scriptDir = os.path.dirname(__file__)
+recent_file_path = os.path.join(scriptDir, 'recent_files.json')
 
 
 def get_logged_in_user_id():
@@ -168,7 +167,7 @@ class MainWindow:
 
         self.center_window(1024, 760)
 
-        self.recent_files = self.load_recent_files(self.recent_file_path)
+        self.recent_files = self.load_recent_files(recent_file_path)
         self.update_recent_submenu()
         show_current_id()
 
@@ -351,7 +350,7 @@ class MainWindow:
 
     def save_recent_file(self):
         try:
-            with open(self.recent_file_path, 'w') as file:
+            with open(recent_file_path, 'w') as file:
                 json.dump(self.recent_files, file)
                 print(f"Arquivo recente salvo: {self.recent_files}")
         except Exception as e:
