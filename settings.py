@@ -1,3 +1,4 @@
+import logging
 import sys
 import os
 
@@ -19,3 +20,17 @@ DB_HOST = os.environ.get("DB_HOST", default='localhost')
 
 def getDatabaseUrl():
     return f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+
+def createDefaultLogging(scriptDir):
+    logFile = os.path.join(scriptDir, 'logs', f"{os.path.basename(sys.executable)}.log")
+
+    os.makedirs(os.path.join(scriptDir, 'logs'), exist_ok=True)
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(logFile),
+            logging.StreamHandler()
+        ]
+    )

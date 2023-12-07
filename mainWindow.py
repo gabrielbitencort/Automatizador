@@ -21,7 +21,7 @@ from managerWindow import ManagerWindow
 
 from timePicker import TimePicker
 from userSession import userSession
-from settings import getDatabaseUrl
+from settings import getDatabaseUrl, createDefaultLogging
 
 db_config = getDatabaseUrl()
 
@@ -32,9 +32,14 @@ else:
     scriptDir = os.path.dirname(__file__)
 recent_file_path = os.path.join(scriptDir, 'recent_files.json')
 
+createDefaultLogging(scriptDir)
+
 
 def get_logged_in_user_id():
     return userSession.get_logged_in_user_id()
+
+def get_logged_in_user_name():
+    return userSession.get_logged_in_user_name()
 
 def open_configWindow():
     configWindow = ConfigWindow()
@@ -48,7 +53,6 @@ def open_managerWindow():
     managerWindow = ManagerWindow()
     managerWindow.window.mainloop()
 
-
 def show_current_id():
     user_id = get_logged_in_user_id()
     print(f"ID do usuário atual: {user_id}")
@@ -58,6 +62,7 @@ class MainWindow:
     def __init__(self, open_registerWindow):
         # User_ID do usuário logado
         self.current_user_id = get_logged_in_user_id()
+        self.current_user_name = get_logged_in_user_name()
 
         self.timer_id = None
 
@@ -125,8 +130,14 @@ class MainWindow:
         self.view_frame.pack(side=tk.RIGHT, padx=10, pady=10)
 
         # Frame informações usuário
-        self.userFrame = tk.Frame(self.window, background='blue')
-        self.userFrame.pack(side=tk.BOTTOM)
+        self.infoFrame = tk.Frame(self.window)
+        self.infoFrame.pack(side=tk.BOTTOM, padx=10, pady=10)
+
+        self.email_status = tk.Label(self.infoFrame, text="")
+        self.email_status.grid(row=0, column=0, pady=5, sticky='w')
+
+        self.user_text = tk.Label(self.infoFrame, text=f"Usuário atual: {self.current_user_name}")
+        self.user_text.grid(row=0, column=1, pady=5, sticky='w')
 
         # textWidget para mostrar e editar conteúdo do arquivo html
         self.text_widget = tk.Text(self.tframe, wrap=tk.WORD, width=160, height=30)
@@ -137,7 +148,8 @@ class MainWindow:
         self.btn_view.grid(row=1, column=0, pady=10, sticky='e')
 
         # botão para enviar emails
-        self.btn_send = tk.Button(self.btn_frame, text='ENVIAR EMAIL', command=self.handle_sendEmails, state=tk.DISABLED)
+        self.btn_send = tk.Button(self.btn_frame, text='ENVIAR EMAIL', command=self.handle_sendEmails,
+                                  state=tk.DISABLED)
         self.btn_send.grid(row=1, column=0, pady=10, sticky='w')
 
         # checkbox para programar horário
@@ -178,14 +190,17 @@ class MainWindow:
                 # Verifica se a thread do temporizador está ativa
                 if not self.timer_id or not self.timer_id.is_alive():
                     # Chama a função sendEmails imediatamente se a checkbox estivar ativa
+                    logging.info("Enviando email temporizado")
                     print("Enviando email temporizado.")
                     self.start_timer()
             else:
+                logging.info("A checkbox não está marcada, enviando email imediatamente")
                 print("A checkbox não está marcada, enviando email imediatamente.")
                 self.sendEmails()
                 self.cancel_timer()
         except Exception as e:
-            print(f"Erro: {e}")
+            logging.exception(f"Erro ao enviar email temporizado: {e}")
+            print(f"Erro ao enviar email temporizado: {e}")
 
     def verify_checkbox(self):
         if self.var_checkbox.get() == 1:
@@ -207,7 +222,8 @@ class MainWindow:
             scheduled_time = self.time.get_selected_time()
 
             # Combina a data e a hora
-            scheduled_datetime = datetime.datetime.combine(scheduled_date, datetime.time(hour=scheduled_time[0], minute=scheduled_time[1]))
+            scheduled_datetime = datetime.datetime.combine(scheduled_date, datetime.time(hour=scheduled_time[0],
+                                                                                         minute=scheduled_time[1]))
 
             # Calcula o tempo restante até a data e hora programada em segundos
             current_time = datetime.datetime.now()
@@ -219,11 +235,14 @@ class MainWindow:
             print(f"")
 
         except threading.ThreadError as e:
+            logging.exception(f"Erro de threading: {e}")
             print(f"Erro de threading: {e}")
         except Exception as e:
+            logging.exception(f"Erro: {e}")
             print(f"Erro: {e}")
 
     def sendEmails_on_timer(self):
+        logging.info("Enviando email temporizado")
         print("Enviando email temporizado")
         self.sendEmails()
 
@@ -247,6 +266,7 @@ class MainWindow:
                 self.sendLabel.config(text=f'enviando para {file_name}')
                 self.btn_send.config(state=tk.NORMAL)
         except Exception as e:
+            logging.exception(f"Erro ao abrir arquivo de contatos: {e}")
             print(f"Erro ao abrir arquivo de contatos: {e}")
 
     @staticmethod
@@ -262,6 +282,7 @@ class MainWindow:
                         emails.append(row[1])
             return names, emails
         except Exception as e:
+            logging.exception(f"Erro ao carregar lista de contatos")
             print(f"Erro ao carregar lista de contatos: {e}")
 
     def read_smtpConfig(self):
@@ -277,9 +298,11 @@ class MainWindow:
             if smtp_data:
                 self.smtpServer, self.smtpPort, self.smtpEmail, self.smtpPassword = smtp_data
             else:
+                logging.error("Nenhuma configuração SMTP encontrada no banco de dados")
                 print("Nenhuma configuração SMTP encontrada no banco de dados.")
         except psycopg2.Error as e:
-            print("Erro ao consultar tabela: ", e)
+            logging.exception(f"Erro ao consultar tabela: {e}")
+            print(f"Erro ao consultar tabela: {e}")
         finally:
             if conn is not None:
                 conn.close()
@@ -294,8 +317,10 @@ class MainWindow:
             if self.current_file is not None:
                 def send_email_func():
                     try:
-                        print("Enviando email com arquivo: ", self.current_file)
-                        print(f"Enviando email com o user_id {self.current_user_id}")
+                        print("Enviando emails com arquivo: ", self.current_file)
+                        print(f"Enviando emails com o user_id {self.current_user_id}")
+                        logging.info("Enviando email imediato")
+                        self.email_status.config(text="Enviando E-mails...")
                         for email in emails:
                             # Create MIMEMultipart object for email
                             msg = MIMEMultipart("alternative")
@@ -318,14 +343,19 @@ class MainWindow:
                             # Send email for recipients
                             server.sendmail(self.smtpEmail.replace("=", "@"), email.replace("=", "@"), msg.as_string())
                             server.quit()
+                            logging.info("Email enviado")
                             print("Email enviado.")
+                            self.email_status.config(text="E-mails enviados")
                     except Exception as e:
+                        logging.exception(f"Erro ao enviar email: {e}")
                         print(f"Erro ao enviar email: {str(e)}")
+                        self.email_status.config(text=f"Erro ao enviar E-mails: {str(e)}")
 
                 # Create a new thread and execute email sending func
                 email_thread = threading.Thread(target=send_email_func)
                 email_thread.start()
             else:
+                logging.error("Arquivo html não selecionado")
                 print("Arquivo html não selecionado.")
 
     def new_file(self):
@@ -346,14 +376,17 @@ class MainWindow:
                 self.load_file_content(file_path)
                 self.save_recent_file()
         except Exception as e:
+            logging.exception(F"Não foi possivel abrir o arquivo: {e}")
             print(f"Não foi possível abrir o arquivo: {e}")
 
     def save_recent_file(self):
         try:
             with open(recent_file_path, 'w') as file:
                 json.dump(self.recent_files, file)
+                logging.info(f"Arquivo recente salvo: {self.recent_files}")
                 print(f"Arquivo recente salvo: {self.recent_files}")
         except Exception as e:
+            logging.exception(f"Erro ao salvar arquivos recentes: {e}")
             print(f"Erro ao salvar arquivos recentes: {e}")
 
     @staticmethod
@@ -366,11 +399,13 @@ class MainWindow:
                 else:
                     recent_files = []
                 return recent_files
-        except FileNotFoundError:
-            print("Erro ao carregar JSON")
+        except FileNotFoundError as e:
+            logging.exception(f"Erro ao carregar JSON: {e}")
+            print(f"Erro ao carregar JSON: {e}")
             return []
-        except PermissionError:
-            print("Erro de permissão ao abrir JSON")
+        except PermissionError as e:
+            logging.exception(f"Erro de prmissão ao abrir JSON: {e}")
+            print(f"Erro de permissão ao abrir JSON: {e}")
             return []
 
     # Add the recent file to recent files list
@@ -397,6 +432,7 @@ class MainWindow:
                 self.text_widget.delete(1.0, tk.END)
                 self.text_widget.insert(tk.END, content)
         except Exception as e:
+            logging.exception(f"Erro ao abrir o arquivo: {str(e)}")
             self.text_widget.delete(1.0, tk.END)
             self.text_widget.insert(tk.END, f'Erro ao abrir o arquivo: {str(e)}')
 

@@ -6,3 +6,7 @@ venv/
 /tests.py
 /Icons
 /logs
+/Automatizador.spec
+dist/
+build/
+Messages/

@@ -10,7 +10,7 @@ import psycopg2
 import uuid
 import os
 
-from settings import getDatabaseUrl
+from settings import getDatabaseUrl, createDefaultLogging
 db_config = getDatabaseUrl()
 
 # Obtém o diretório do script
@@ -19,21 +19,7 @@ if getattr(sys, 'frozen', False):
 else:
     scriptDir = os.path.dirname(__file__)
 
-# Define o diretório de logs como um subdiretório chamado 'logs'
-logFile = os.path.join(scriptDir, 'logs', f"{os.path.basename(sys.executable)}.log")
-
-# Cria o diretório se não existir
-os.makedirs(os.path.join(scriptDir, 'logs'), exist_ok=True)
-
-# Configuração do logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(logFile),
-        logging.StreamHandler()
-    ]
-)
+createDefaultLogging(scriptDir)
 
 
 def get_logged_in_user_id():
@@ -41,6 +27,9 @@ def get_logged_in_user_id():
 
 def set_logged_in_user_id(current_user_id):
     return userSession.set_logged_in_user_id(current_user_id)
+
+def set_logged_in_user_name(user_name):
+    return userSession.set_logged_in_user_name(user_name)
 
 def open_mainWindow():
     try:
@@ -110,6 +99,7 @@ def login(event=None):
 
                 if verify_password(stored_password_hash, password):
                     set_logged_in_user_id(user_id)
+                    set_logged_in_user_name(user_name)
                     print("Login realizado com sucesso.")
                     print(f"ID de usuário: {user_id}")
 
