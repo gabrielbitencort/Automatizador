@@ -21,6 +21,7 @@ DB_HOST = os.environ.get("DB_HOST", default='localhost')
 def getDatabaseUrl():
     return f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
 
+
 def createDefaultLogging(scriptDir):
     logFile = os.path.join(scriptDir, 'logs', f"{os.path.basename(sys.executable)}.log")
 

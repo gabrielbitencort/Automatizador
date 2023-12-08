@@ -25,11 +25,14 @@ createDefaultLogging(scriptDir)
 def get_logged_in_user_id():
     return userSession.get_logged_in_user_id()
 
+
 def set_logged_in_user_id(current_user_id):
     return userSession.set_logged_in_user_id(current_user_id)
 
+
 def set_logged_in_user_name(user_name):
     return userSession.set_logged_in_user_name(user_name)
+
 
 def open_mainWindow():
     try:
